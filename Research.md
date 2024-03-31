@@ -5,4 +5,5 @@
 
 ## Related study materials/courses 
 
-- [Docker | Datacamp](https://app.datacamp.com/learn/courses/introduction-to-docker) Learn the Docker basics and understand how to create and manage containers using Dockerfiles and instructions.
+- [Docker | Datacamp ](https://app.datacamp.com/learn/courses/introduction-to-docker) Learn the Docker basics and understand how to create and manage containers using Dockerfiles and instructions.
+- [Data Engineering | Datacamp ](https://app.datacamp.com/learn/courses/introduction-to-data-engineering) Introduction to Data Engineering
