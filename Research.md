@@ -7,3 +7,34 @@
 
 - [Docker | Datacamp ](https://app.datacamp.com/learn/courses/introduction-to-docker) Learn the Docker basics and understand how to create and manage containers using Dockerfiles and instructions.
 - [Data Engineering | Datacamp ](https://app.datacamp.com/learn/courses/introduction-to-data-engineering) Introduction to Data Engineering
+
+
+## work flow
+
+```mermaid
+graph LR
+A(Weather)
+B(Air quality)
+C(Footfall)
+D(Weather Transform)
+E(Air quality Transform)
+F(Footfall Transform)
+G(MongoDB)
+H(Join)
+I(Postgres)
+J(Analysis)
+
+A -- exctract --> G
+B -- exctract --> G
+C -- exctract --> G
+
+G --> D
+G --> E
+G --> F
+
+D --> H
+E --> H
+F --> H
+
+H -- load --> I --> J
+```
