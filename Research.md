@@ -24,17 +24,7 @@ H(Join)
 I(Postgres)
 J(Analysis)
 
-A -- exctract --> G
-B -- exctract --> G
-C -- exctract --> G
-
-G --> D
-G --> E
-G --> F
-
-D --> H
-E --> H
-F --> H
-
-H -- load --> I --> J
+A -- exctract --> G --> D --> H
+B -- exctract --> G --> E --> H -- load --> I --> J
+C -- exctract --> G --> F --> H
 ```
