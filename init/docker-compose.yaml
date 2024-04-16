@@ -1,0 +1,60 @@
+version: '3'
+services:
+  main:
+    container_name: main
+    build: .
+    ports:
+      - "3000:3000"
+    depends_on:
+      - mongodb
+      - postgres
+      - cassandra-db
+
+  mongodb:
+    image: "mongo"
+    container_name: mongodb_database
+    environment:
+          MONGO_INITDB_ROOT_USERNAME: dap
+          MONGO_INITDB_ROOT_PASSWORD: dap
+          MONGO_INITDB_DATABASE: DAPPROJECT
+    ports:
+          - 27017-27019:27017-27019
+    volumes:
+          - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+    restart: unless-stopped
+
+  postgres:
+    image: "postgres" # use the latest postgresql version
+    container_name: postgres_database
+    ports:
+        - "5432:5432"
+    env_file:
+        - postgresql.env # postgresql configuration data
+    volumes:
+        - dbdata:/var/lib/postgresql/data/
+        - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+
+  cassandra-db:
+    image: "cassandra"
+    container_name: cassandra_database
+    ports:
+      - "9042:9042"
+    environment:
+      - "MAX_HEAP_SIZE=384M"
+      - "HEAP_NEWSIZE=128M"
+
+  mongo-express:
+    image: mongo-express
+    restart: always
+    ports:
+     - 8081:8081
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: dap
+      ME_CONFIG_MONGODB_ADMINPASSWORD: dap
+      ME_CONFIG_MONGODB_SERVER: mongodb
+    depends_on:
+     - "mongodb"
+
+
+volumes:
+    dbdata:

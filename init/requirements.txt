@@ -1,0 +1,10 @@
+pymongo
+bokeh
+dagster
+dagster-pandas
+dagit
+pandas
+pendulum<3.0
+psycopg2
+sqlalchemy
+cassandra-driver

@@ -2,7 +2,7 @@ version: "3.8"
 services:
     mongodb:
       image: mongo
-      container_name: PFPDAPmongodb
+      container_name: DAPmongodb
       environment:
             MONGO_INITDB_ROOT_USERNAME: dap
             MONGO_INITDB_ROOT_PASSWORD: dap
