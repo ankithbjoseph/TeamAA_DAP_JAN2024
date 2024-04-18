@@ -52,7 +52,7 @@ def visualise(start):
         )
         # show the visualisation
         show(p)
-        return p
+       # return p
     except exc.SQLAlchemyError as dbError:
         print ("PostgreSQL Error", dbError)
     finally:
