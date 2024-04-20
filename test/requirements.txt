@@ -1,0 +1,14 @@
+pymongo
+bokeh
+dagster
+dagster-pandas
+dagit
+pandas
+pendulum<3.0
+psycopg2
+sqlalchemy
+openmeteo-requests
+requests-cache
+retry-requests
+numpy
+pandas

@@ -1,1 +1,1 @@
-CREATE DATABASE flights;
+CREATE DATABASE projectdb;
