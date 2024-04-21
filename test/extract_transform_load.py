@@ -280,7 +280,9 @@ def load(x, y, z):
     footfall_df = pd.DataFrame(list(footfall_collection.find({})))
 
     weather_aqi_df = pd.merge(weather_df, aqi_df, on="_id")
-    weather_aqi_df.to_sql("mergedb", postgres_engine, if_exists="replace", index=False)
+    weather_aqi_df.to_sql(
+        "merged_db", postgres_engine, if_exists="replace", index=False
+    )
 
 
 @job

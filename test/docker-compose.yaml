@@ -142,3 +142,6 @@ configs:
         }
   createdb.sql:
     content: CREATE DATABASE projectdb;
+
+volumes:
+  postgres-data:
