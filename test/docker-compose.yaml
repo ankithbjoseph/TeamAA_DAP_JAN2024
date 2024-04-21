@@ -15,6 +15,7 @@ services:
     configs:
       - source: dagster.yaml
         target: /main/dagster.yaml
+
   ## MONGODB
 
   mongodb:
@@ -44,6 +45,8 @@ services:
       POSTGRES_DB: postgres
       POSTGRES_USER: ${USER}
       POSTGRES_PASSWORD: ${PASSWORD}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
     configs:
       - source: createdb.sql
         target: /docker-entrypoint-initdb.d/createdb.sql
@@ -83,6 +86,8 @@ services:
       - source: pgpass
         target: /pgpass
     restart: unless-stopped
+    depends_on:
+      - postgres
 
   ## SUPERSET
 

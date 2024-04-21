@@ -4,6 +4,7 @@ import openmeteo_requests
 import requests_cache
 import pandas as pd
 from retry_requests import retry
+from sqlalchemy import create_engine
 
 log = get_dagster_logger()
 # Setup the Open-Meteo API client with cache and retry on error
@@ -48,21 +49,18 @@ def extract_weather() -> bool:
     }
     try:
         client = MongoClient(mongo_connect)
-        project_db = client["projectdb_mongo"]
+        projectdb_mongo = client["projectdb_mongo"]
 
-        # Connect to the flights collection
-        weather_collection = project_db["weather_collection"]
+        weather_collection = projectdb_mongo["weather_collection"]
 
         responses = openmeteo.weather_api(url, params=params)
 
-        # Process first location. Add a for-loop for multiple locations or weather models
         response = responses[0]
         print(f"Coordinates {response.Latitude()}°N {response.Longitude()}°E")
         print(f"Elevation {response.Elevation()} m asl")
         print(f"Timezone {response.Timezone()} {response.TimezoneAbbreviation()}")
         print(f"Timezone difference to GMT+0 {response.UtcOffsetSeconds()} s")
 
-        # Process hourly data. The order of variables needs to be the same as requested.
         hourly = response.Hourly()
         hourly_temperature_2m = hourly.Variables(0).ValuesAsNumpy()
         hourly_relative_humidity_2m = hourly.Variables(1).ValuesAsNumpy()
@@ -150,10 +148,9 @@ def extract_air_quality_index() -> bool:
     }
     try:
         client = MongoClient(mongo_connect)
-        project_db = client["projectdb_mongo"]
+        projectdb_mongo = client["projectdb_mongo"]
 
-        # Connect to the flights collection
-        aqi_collection = project_db["aqi_collection"]
+        aqi_collection = projectdb_mongo["aqi_collection"]
 
         responses = openmeteo.weather_api(url, params=params)
 
@@ -231,8 +228,8 @@ def extract_footfall() -> bool:
     result = True
     try:
         client = MongoClient(mongo_connect)
-        project_db = client["projectdb_mongo"]
-        footfall_collection = project_db["footfall_collection"]
+        projectdb_mongo = client["projectdb_mongo"]
+        footfall_collection = projectdb_mongo["footfall_collection"]
 
         footfall_csv = "footfall.csv"
         try:
@@ -266,15 +263,26 @@ def extract_footfall() -> bool:
     return result
 
 
-@op(ins={"start": In(bool)}, out=Out())
-def transform_weather(start):
+@op()
+def load(x, y, z):
     client = MongoClient(mongo_connect)
+    projectdb_mongo = client["projectdb_mongo"]
+    postgres_engine = create_engine(
+        "postgresql://dap:dap@postgres_database:5432/projectdb"
+    )
 
-    weather_data = client
+    weather_collection = projectdb_mongo["weather_collection"]
+    aqi_collection = projectdb_mongo["aqi_collection"]
+    footfall_collection = projectdb_mongo["footfall_collection"]
+
+    weather_df = pd.DataFrame(list(weather_collection.find({})))
+    aqi_df = pd.DataFrame(list(aqi_collection.find({})))
+    footfall_df = pd.DataFrame(list(footfall_collection.find({})))
+
+    weather_aqi_df = pd.merge(weather_df, aqi_df, on="_id")
+    weather_aqi_df.to_sql("mergedb", postgres_engine, if_exists="replace", index=False)
 
 
 @job
 def etl():
-    transform_weather(extract_weather())
-    extract_air_quality_index()
-    extract_footfall()
+    load(extract_weather(), extract_air_quality_index(), extract_footfall())
