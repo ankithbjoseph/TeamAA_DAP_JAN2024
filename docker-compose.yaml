@@ -12,6 +12,8 @@ services:
     depends_on:
       - mongodb
       - postgres
+    volumes:
+      - ./output:/main/storage
     configs:
       - source: dagster.yaml
         target: /main/dagster.yaml
@@ -88,26 +90,6 @@ services:
     restart: unless-stopped
     depends_on:
       - postgres
-  ## SUPERSET
-
-  # superset:
-  #   container_name: superset
-  #   build:
-  #     context: .
-  #     dockerfile: ./superset/Dockerfile
-  #     args:
-  #       POSTGRES_USER: ${USER}
-  #       POSTGRES_PASSWORD: ${PASSWORD}
-  #       SUPERSET_ADMIN: ${USER}
-  #       SUPERSET_PASSWORD: ${PASSWORD}
-  #       SUPERSET_SECRET_KEY: ${SUPERSET_SECRET_KEY}
-  #   environment:
-  #     SUPERSET_SECRET_KEY: ${SUPERSET_SECRET_KEY}
-  #   ports:
-  #     - "8088:8088"
-  #   command: gunicorn --bind  "0.0.0.0:8088" --access-logfile '-' --error-logfile '-' --workers 1 --worker-class gthread --threads 20 --timeout 60 --limit-request-line 0 --limit-request-field_size 0 "superset.app:create_app()"
-  #   depends_on:
-  #     - dagster
 
   ##JUPYTER
 
