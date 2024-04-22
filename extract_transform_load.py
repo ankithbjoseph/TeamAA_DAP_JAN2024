@@ -264,7 +264,7 @@ def extract_footfall() -> bool:
         result = False
 
     # Return a Boolean indicating success or failure
-    return result
+    #return result
 
 
 @op()
