@@ -5,6 +5,7 @@ import requests_cache
 import pandas as pd
 from retry_requests import retry
 from sqlalchemy import create_engine
+from functools import reduce
 
 log = get_dagster_logger()
 # Setup the Open-Meteo API client with cache and retry on error
@@ -81,7 +82,7 @@ def extract_weather() -> bool:
                 start=pd.to_datetime(hourly.Time(), unit="s", utc=True),
                 end=pd.to_datetime(hourly.TimeEnd(), unit="s", utc=True),
                 freq=pd.Timedelta(seconds=hourly.Interval()),
-                inclusive="left",
+                inclusive="right",
             )
         }
         hourly_data["temperature_2m"] = hourly_temperature_2m
@@ -181,7 +182,7 @@ def extract_air_quality_index() -> bool:
                 start=pd.to_datetime(hourly.Time(), unit="s", utc=True),
                 end=pd.to_datetime(hourly.TimeEnd(), unit="s", utc=True),
                 freq=pd.Timedelta(seconds=hourly.Interval()),
-                inclusive="left",
+                inclusive="right",
             )
         }
         hourly_data["pm10"] = hourly_pm10
@@ -264,27 +265,87 @@ def extract_footfall() -> bool:
 
 
 @op()
-def load(x, y, z):
+def transform_weather(start) -> pd.DataFrame:
     client = MongoClient(mongo_connect)
     projectdb_mongo = client["projectdb_mongo"]
-    postgres_engine = create_engine(
-        "postgresql://dap:dap@postgres_database:5432/projectdb"
-    )
 
     weather_collection = projectdb_mongo["weather_collection"]
-    aqi_collection = projectdb_mongo["aqi_collection"]
-    footfall_collection = projectdb_mongo["footfall_collection"]
 
     weather_df = pd.DataFrame(list(weather_collection.find({})))
-    aqi_df = pd.DataFrame(list(aqi_collection.find({})))
-    footfall_df = pd.DataFrame(list(footfall_collection.find({})))
 
-    weather_aqi_df = pd.merge(weather_df, aqi_df, on="_id")
-    weather_aqi_df.to_sql(
-        "merged_db", postgres_engine, if_exists="replace", index=False
+    weather_df["date"] = pd.to_datetime(weather_df["date"])
+
+    weather_df = weather_df[
+        (weather_df["date"] >= "2023-01-01") & (weather_df["date"] < "2024-01-01")
+    ]
+
+    return weather_df
+
+
+@op()
+def transform_aqi(start) -> pd.DataFrame:
+    client = MongoClient(mongo_connect)
+    projectdb_mongo = client["projectdb_mongo"]
+
+    aqi_collection = projectdb_mongo["aqi_collection"]
+
+    aqi_df = pd.DataFrame(list(aqi_collection.find({})))
+
+    aqi_df["date"] = pd.to_datetime(aqi_df["date"])
+
+    # Filtering data from 2023-01-01 to 2023-12-31
+    aqi_df = aqi_df[(aqi_df["date"] >= "2023-01-01") & (aqi_df["date"] < "2024-01-01")]
+
+    return aqi_df
+
+
+@op()
+def transform_footfall(start) -> pd.DataFrame:
+    client = MongoClient(mongo_connect)
+    projectdb_mongo = client["projectdb_mongo"]
+    aqi_collection = projectdb_mongo["footfall_collection"]
+    footfall_df = pd.DataFrame(list(aqi_collection.find({})))
+    # Cleaning data removing all variables with more than 80% Null Values
+    threshold = 0.8
+    missing_percentage = footfall_df.isna().sum() / len(footfall_df)
+    columns_to_drop = missing_percentage[missing_percentage > threshold].index
+    footfall_df = footfall_df.drop(columns=columns_to_drop)
+    footfall_df = footfall_df.fillna(0)
+    return footfall_df
+
+
+@op()
+def join_data(weather_df, aqi_df, footfall_df) -> pd.DataFrame:
+    aqi_df = aqi_df.drop("date", axis=1)
+    dfs = [weather_df, aqi_df, footfall_df]
+    merged_df = reduce(
+        lambda left, right: pd.merge(left, right, on="_id", how="inner"), dfs
     )
+
+    return merged_df
+
+
+@op()
+def load_df(merged_df):
+    postgres_engine = create_engine(postgres_connect)
+
+    with postgres_engine.connect() as conn:
+        row_count = merged_df.to_sql(
+            name="weather_aqi_footfall",
+            schema="public",
+            con=conn,
+            index=False,
+            if_exists="replace",
+        )
+        log.info("{} records loaded".format(row_count))
 
 
 @job
 def etl():
-    extract_weather(), extract_air_quality_index(), extract_footfall()
+    load_df(
+        join_data(
+            transform_weather(extract_weather()),
+            transform_aqi(extract_air_quality_index()),
+            transform_footfall(extract_footfall()),
+        )
+    )

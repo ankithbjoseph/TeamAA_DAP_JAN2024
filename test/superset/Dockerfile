@@ -19,4 +19,4 @@ RUN superset fab create-admin \
 RUN superset db upgrade
 RUN superset init
 RUN superset set_database_uri -d postgresql  -u postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres_database:5432/projectdb
-# RUN superset import-dashboards -p ./dashboard.zip -u ${SUPERSET_ADMIN}
+RUN superset import-dashboards -p ./dashboard.zip -u ${SUPERSET_ADMIN}
