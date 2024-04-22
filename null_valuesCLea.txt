@@ -1,0 +1,96 @@
+Count of null values in each column:
+_id                                                              0
+Time                                                             0
+Aston Quay/Fitzgeralds                                           0
+Aston Quay/Fitzgeralds IN                                        0
+Aston Quay/Fitzgeralds OUT                                       0
+Bachelors walk/Bachelors way                                     0
+Bachelors walk/Bachelors way IN                                  0
+Bachelors walk/Bachelors way OUT                                 0
+Baggot st lower/Wilton tce inbound                               0
+Baggot st lower/Wilton tce inbound Pedestrians IN                0
+Baggot st lower/Wilton tce inbound Pedestrians OUT               0
+Baggot st upper/Mespil rd/Bank                                   0
+Baggot st upper/Mespil rd/Bank Pedestrians IN                    0
+Baggot st upper/Mespil rd/Bank Pedestrians OUT                   0
+Capel st/Mary street                                             0
+Capel st/Mary street Pedestrian IN                               0
+Capel st/Mary street Pedestrian OUT                              0
+College Green/Bank Of Ireland                                    0
+College Green/Bank Of Ireland IN                                 0
+College Green/Bank Of Ireland OUT                                0
+College Green/Church Lane                                        0
+College Green/Church Lane IN                                     0
+College Green/Church Lane OUT                                    0
+College st/Westmoreland st                                       0
+College st/Westmoreland st IN                                    0
+College st/Westmoreland st OUT                                   0
+D'olier st/Burgh Quay                                            0
+D'olier st/Burgh Quay IN                                         0
+D'olier st/Burgh Quay OUT                                        0
+Dame Street/Londis                                               0
+Dame Street/Londis Pedestrian IN                                 0
+Dame Street/Londis Pedestrian OUT                                0
+Grafton st/Monsoon                                               0
+Grafton st/Monsoon Pedestrian IN                                 0
+Grafton st/Monsoon Pedestrian OUT                                0
+Grafton Street / Nassau Street / Suffolk Street                  0
+Grafton Street / Nassau Street / Suffolk Street IN               0
+Grafton Street / Nassau Street / Suffolk Street OUT              0
+Grafton Street/CompuB                                            0
+Grafton Street/CompuB IN                                         0
+Grafton Street/CompuB OUT                                        0
+Grand Canal st upp/Clanwilliam place                             0
+Grand Canal st upp/Clanwilliam place Pedestrians IN              0
+Grand Canal st upp/Clanwilliam place Pedestrians OUT             0
+Grand Canal st upp/Clanwilliam place/Google                      0
+Grand Canal st upp/Clanwilliam place/Google Pedestrians IN       0
+Grand Canal st upp/Clanwilliam place/Google Pedestrians OUT      0
+Henry Street/Coles Lane/Dunnes                                   0
+Henry Street/Coles Lane/Dunnes Pedestrian IN                     0
+Henry Street/Coles Lane/Dunnes Pedestrian OUT                    0
+Liffey st/Halfpenny Bridge                                       0
+Liffey st/Halfpenny Bridge  Pedestrian IN                        0
+Liffey st/Halfpenny Bridge  Pedestrian OUT                       0
+Mary st/Jervis st                                                0
+Mary st/Jervis st IN                                             0
+Mary st/Jervis st OUT                                            0
+Newcomen Bridge/Charleville mall inbound                         0
+Newcomen Bridge/Charleville mall inbound Pedestrians IN          0
+Newcomen Bridge/Charleville mall inbound Pedestrians OUT         0
+Newcomen Bridge/Charleville mall outbound                        0
+Newcomen Bridge/Charleville mall outbound Pedestrians IN         0
+Newcomen Bridge/Charleville mall outbound Pedestrians OUT        0
+North Wall Quay/Samuel Beckett bridge East                       0
+North Wall Quay/Samuel Beckett bridge East Channel 1 IN          0
+North Wall Quay/Samuel Beckett bridge East Channel 2 OUT         0
+North Wall Quay/Samuel Beckett bridge West                       0
+North Wall Quay/Samuel Beckett bridge West Pedestrians IN        0
+North Wall Quay/Samuel Beckett bridge West Pedestrians OUT       0
+O'Connell St/Parnell St/AIB                                      0
+O'Connell St/Parnell St/AIB IN                                   0
+O'Connell St/Parnell St/AIB OUT                                  0
+O'Connell St/Pennys Pedestrian                                   0
+O'Connell St/Pennys Pedestrian IN                                0
+O'Connell St/Pennys Pedestrian OUT                               0
+O'Connell st/Princes st North                                    0
+O'Connell st/Princes st North IN                                 0
+O'Connell st/Princes st North OUT                                0
+Phibsborough Rd/Enniskerry Road                                  0
+Phibsborough Rd/Enniskerry Road Pedestrians IN                   0
+Phibsborough Rd/Enniskerry Road Pedestrians OUT                  0
+Richmond st south/Portabello Harbour inbound                     0
+Richmond st south/Portabello Harbour inbound Pedestrians IN      0
+Richmond st south/Portabello Harbour inbound Pedestrians OUT     0
+Richmond st south/Portabello Harbour outbound                    0
+Richmond st south/Portabello Harbour outbound Pedestrians IN     0
+Richmond st south/Portabello Harbour outbound Pedestrians OUT    0
+Talbot st/Guineys                                                0
+Talbot st/Guineys IN                                             0
+Talbot st/Guineys OUT                                            0
+Westmoreland Street East/Fleet street                            0
+Westmoreland Street East/Fleet street IN                         0
+Westmoreland Street East/Fleet street OUT                        0
+Westmoreland Street West/Carrolls                                0
+Westmoreland Street West/Carrolls IN                             0
+Westmoreland Street West/Carrolls OUT                            0
