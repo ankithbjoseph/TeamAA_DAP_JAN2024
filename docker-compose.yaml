@@ -1,0 +1,147 @@
+version: '3'
+name: dap_team_aa
+services:
+
+  ## DAGSTER
+
+  dagster:
+    container_name: dagster_etl
+    build: .
+    ports:
+      - "3000:3000"
+    depends_on:
+      - mongodb
+      - postgres
+    configs:
+      - source: dagster.yaml
+        target: /main/dagster.yaml
+
+  ## MONGODB
+
+  mongodb:
+    image: "mongo"
+    container_name: mongodb_database
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${PASSWORD}
+    ports:
+      - 27017-27019:27017-27019
+    restart: unless-stopped
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok'
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 10s
+
+  ## POSTGRES
+
+  postgres:
+    image: "postgres"
+    container_name: postgres_database
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: ${USER}
+      POSTGRES_PASSWORD: ${PASSWORD}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    configs:
+      - source: createdb.sql
+        target: /docker-entrypoint-initdb.d/createdb.sql
+
+  ## MONGO EXPRESS
+
+  mongo-express:
+    image: mongo-express
+    container_name: mongo-express
+    restart: unless-stopped
+    ports:
+      - 8081:8081
+    environment:
+      ME_CONFIG_MONGODB_URL: "mongodb://${USER}:${PASSWORD}@mongodb_database:27017"
+      ME_CONFIG_BASICAUTH_USERNAME: ${USER}
+      ME_CONFIG_BASICAUTH_PASSWORD: ${PASSWORD}
+    depends_on:
+      - mongodb
+
+  ## PGADMIN
+
+  pgadmin:
+    container_name: pgadmin
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PASSWORD}
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+      PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED: 'False'
+    ports:
+      - "5050:80"
+    entrypoint: /bin/sh -c "chmod 600 /pgpass; /entrypoint.sh;"
+    user: root
+    configs:
+      - source: servers.json
+        target: /pgadmin4/servers.json
+      - source: pgpass
+        target: /pgpass
+    restart: unless-stopped
+    depends_on:
+      - postgres
+
+  ## SUPERSET
+
+  superset:
+    container_name: superset
+    build:
+      context: .
+      dockerfile: ./superset/Dockerfile
+      args:
+        POSTGRES_USER: ${USER}
+        POSTGRES_PASSWORD: ${PASSWORD}
+        SUPERSET_ADMIN: ${USER}
+        SUPERSET_PASSWORD: ${PASSWORD}
+        SUPERSET_SECRET_KEY: ${SUPERSET_SECRET_KEY}
+    environment:
+      SUPERSET_SECRET_KEY: ${SUPERSET_SECRET_KEY}
+    ports:
+      - "8088:8088"
+    command: gunicorn --bind  "0.0.0.0:8088" --access-logfile '-' --error-logfile '-' --workers 1 --worker-class gthread --threads 20 --timeout 60 --limit-request-line 0 --limit-request-field_size 0 "superset.app:create_app()"
+    depends_on:
+      - dagster
+
+## CONFIGS
+
+configs:
+  dagster.yaml:
+    content: |
+      telemetry:
+        enabled: false
+
+      python_logs:
+        managed_python_loggers:
+          - logger
+
+  pgpass:
+    content: postgres_database:5432:*:${USER}:${PASSWORD}
+  servers.json:
+    content: |
+      {
+          "Servers": {
+            "1": {
+              "Name": "postgres",
+              "Group": "Servers",
+              "Host": "postgres_database",
+              "Port": 5432,
+              "MaintenanceDB": "postgres",
+              "Username": "dap",
+              "PassFile": "/pgpass",
+              "SSLMode": "prefer"
+            }
+          }
+        }
+  createdb.sql:
+    content: CREATE DATABASE projectdb;
+
+volumes:
+  postgres-data:
