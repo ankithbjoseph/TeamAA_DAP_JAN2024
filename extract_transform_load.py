@@ -6,6 +6,9 @@ import pandas as pd
 from retry_requests import retry
 from sqlalchemy import create_engine
 from functools import reduce
+import dagstermill as dm
+from dagstermill import ConfigurableLocalOutputNotebookIOManager
+
 
 log = get_dagster_logger()
 # Setup the Open-Meteo API client with cache and retry on error
@@ -326,7 +329,7 @@ def join_data(weather_df, aqi_df, footfall_df) -> pd.DataFrame:
 
 
 @op()
-def load_df(merged_df):
+def load_df(merged_df) -> bool:
     postgres_engine = create_engine(postgres_connect)
 
     with postgres_engine.connect() as conn:
@@ -338,14 +341,29 @@ def load_df(merged_df):
             if_exists="replace",
         )
         log.info("{} records loaded".format(row_count))
+        return True
 
 
-@job
+analysis = dm.define_dagstermill_op(
+    "Analysis",
+    notebook_path="./analysis/analysis.ipynb",
+    output_notebook_name="outputnotebook",
+    ins={"result": In(bool)},
+)
+
+
+@job(
+    resource_defs={
+        "output_notebook_io_manager": ConfigurableLocalOutputNotebookIOManager(),
+    }
+)
 def etl():
-    load_df(
-        join_data(
-            transform_weather(extract_weather()),
-            transform_aqi(extract_air_quality_index()),
-            transform_footfall(extract_footfall()),
+    analysis(
+        load_df(
+            join_data(
+                transform_weather(extract_weather()),
+                transform_aqi(extract_air_quality_index()),
+                transform_footfall(extract_footfall()),
+            )
         )
     )
