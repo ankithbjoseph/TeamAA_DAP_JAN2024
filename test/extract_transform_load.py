@@ -287,4 +287,4 @@ def load(x, y, z):
 
 @job
 def etl():
-    load(extract_weather(), extract_air_quality_index(), extract_footfall())
+    extract_weather(), extract_air_quality_index(), extract_footfall()
