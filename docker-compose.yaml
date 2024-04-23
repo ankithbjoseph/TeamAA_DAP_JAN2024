@@ -1,5 +1,5 @@
 version: '3'
-name: team_aa_dap_2024
+name: dap_team_aa
 services:
 
   ## DAGSTER
@@ -101,8 +101,6 @@ services:
       - ./analysis:/main
     ports:
       - 8888:8888
-    environment:
-      POSTGRES_HOST: ${POSTGRES_HOST}
     container_name: jupyter_notebook
     command: "start-notebook.sh --NotebookApp.token="
   ## CONFIGS
