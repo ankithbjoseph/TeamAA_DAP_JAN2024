@@ -352,18 +352,12 @@ analysis = dm.define_dagstermill_op(
 )
 
 
-@op()
-def alert():
-    log.info("http://localhost:8888/notebooks/analysis.ipynb")
-
-
 @job(
     resource_defs={
         "output_notebook_io_manager": ConfigurableLocalOutputNotebookIOManager(),
     }
 )
 def etl():
-    (alert(),)
     analysis(
         load_df(
             join_data(
