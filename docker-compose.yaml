@@ -104,7 +104,7 @@ services:
     ports:
       - 8888:8888
     environment:
-      POSTGRES_HOST: ${POSTGRES_HOST}
+      POSTGRES_HOST: postgres_database
     container_name: jupyter_notebook
     command: "start-notebook.sh --NotebookApp.token="
   ## CONFIGS
