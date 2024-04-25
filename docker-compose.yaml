@@ -14,6 +14,8 @@ services:
       - postgres
     volumes:
       - ./output:/main/storage
+    environment:
+      POSTGRES_HOST: postgres_database
     configs:
       - source: dagster.yaml
         target: /main/dagster.yaml
@@ -102,7 +104,7 @@ services:
     ports:
       - 8888:8888
     environment:
-      POSTGRES_HOST: ${POSTGRES_HOST}
+      POSTGRES_HOST: postgres_database
     container_name: jupyter_notebook
     command: "start-notebook.sh --NotebookApp.token="
   ## CONFIGS
