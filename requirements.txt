@@ -13,3 +13,6 @@ pyarrow==14.0.0
 dagstermill
 psycopg2-binary
 bokeh
+jupyter_bokeh
+panel 
+watchfiles
