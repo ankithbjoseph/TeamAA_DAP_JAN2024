@@ -103,6 +103,7 @@ services:
       - ./analysis:/main
     ports:
       - 8888:8888
+      - 5006:5006
     environment:
       POSTGRES_HOST: postgres_database
     container_name: jupyter_notebook
