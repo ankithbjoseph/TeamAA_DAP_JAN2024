@@ -15,8 +15,9 @@ retry_session = retry(cache_session, retries=5, backoff_factor=0.2)
 openmeteo = openmeteo_requests.Client(session=retry_session)
 postgres_connect = "postgresql://dap:dap@postgres_database:5432/projectdb"
 mongo_connect = "mongodb://dap:dap@mongodb_database"
-#postgres_connect = "postgresql://dap:dap@127.0.0.1:5432/projectdb"
-#mongo_connect = "mongodb://dap:dap@127.0.0.1"
+# postgres_connect = "postgresql://dap:dap@127.0.0.1:5432/projectdb"
+# mongo_connect = "mongodb://dap:dap@127.0.0.1"
+
 
 @op(out=Out(bool))
 def extract_weather() -> bool:
@@ -121,7 +122,7 @@ def extract_weather() -> bool:
 
 
 @op(out=Out(bool))
-def extract_air_quality_index() -> bool:
+def extract_aqi() -> bool:
     result = True
     url = "https://air-quality-api.open-meteo.com/v1/air-quality"
     params = {
@@ -262,133 +263,65 @@ def extract_footfall() -> bool:
     # Return a Boolean indicating success or failure
     return result
 
+
 WeatherDataFrame = create_dagster_pandas_dataframe_type(
     name="WeatherDataFrame",
     columns=[
         PandasColumn.integer_column(
             name="_id",
-            non_nullable=True # specify that the column shouldn't contain NAs
+            non_nullable=True,  # specify that the column shouldn't contain NAs
         ),
         PandasColumn.datetime_column(
             name="date",
-            non_nullable=True # specify that the column shouldn't contain NAs
+            non_nullable=True,  # specify that the column shouldn't contain NAs
         ),
-        PandasColumn.float_column(
-            name="temperature_2m",
-            non_nullable=True    
-        ),
-        PandasColumn.float_column(
-            name="relative_humidity_2m",
-            non_nullable=True    
-        ),
-        PandasColumn.float_column(
-            name="dew_point_2m",
-            non_nullable=True    
-        ),
-        PandasColumn.float_column(
-            name="apparent_temperature",
-            non_nullable=True    
-        ),
-        PandasColumn.float_column(
-            name="precipitation",
-            non_nullable=True
-        ),
-        PandasColumn.float_column(
-            name="rain",
-            non_nullable=True
-        ),
-        PandasColumn.float_column(
-            name="snowfall",
-            non_nullable=True
-        ),
-        PandasColumn.float_column(
-            name="weather_code",
-            non_nullable=True    
-        ),
-        PandasColumn.float_column(
-            name="cloud_cover",
-            non_nullable=True    
-        ),
-        PandasColumn.float_column(
-            name="wind_speed_10m",
-            non_nullable=True    
-        ),
-        PandasColumn.float_column(
-            name="wind_direction_10m",
-            non_nullable=True    
-        ),
-        PandasColumn.float_column(
-            name="is_day",
-            non_nullable=True
-        ),
-        PandasColumn.float_column(
-            name="sunshine_duration",
-            non_nullable=True
-        )
-    ]
+        PandasColumn.float_column(name="temperature_2m", non_nullable=True),
+        PandasColumn.float_column(name="relative_humidity_2m", non_nullable=True),
+        PandasColumn.float_column(name="dew_point_2m", non_nullable=True),
+        PandasColumn.float_column(name="apparent_temperature", non_nullable=True),
+        PandasColumn.float_column(name="precipitation", non_nullable=True),
+        PandasColumn.float_column(name="rain", non_nullable=True),
+        PandasColumn.float_column(name="snowfall", non_nullable=True),
+        PandasColumn.float_column(name="weather_code", non_nullable=True),
+        PandasColumn.float_column(name="cloud_cover", non_nullable=True),
+        PandasColumn.float_column(name="wind_speed_10m", non_nullable=True),
+        PandasColumn.float_column(name="wind_direction_10m", non_nullable=True),
+        PandasColumn.float_column(name="is_day", non_nullable=True),
+        PandasColumn.float_column(name="sunshine_duration", non_nullable=True),
+    ],
 )
 AqiDataFrame = create_dagster_pandas_dataframe_type(
     name="AqiDataFr",
     columns=[
         PandasColumn.integer_column(
             name="_id",
-            non_nullable=True # specify that the column shouldn't contain NAs
+            non_nullable=True,  # specify that the column shouldn't contain NAs
         ),
         PandasColumn.datetime_column(
             name="date",
-            non_nullable=True # specify that the column shouldn't contain NAs
+            non_nullable=True,  # specify that the column shouldn't contain NAs
         ),
+        PandasColumn.float_column(name="pm10", non_nullable=True),
+        PandasColumn.float_column(name="pm2_5", non_nullable=True),
+        PandasColumn.float_column(name="carbon_monoxide", non_nullable=True),
+        PandasColumn.float_column(name="nitrogen_dioxide", non_nullable=True),
+        PandasColumn.float_column(name="sulphur_dioxide", non_nullable=True),
+        PandasColumn.float_column(name="dust", non_nullable=True),
+        PandasColumn.float_column(name="european_aqi", non_nullable=True),
+        PandasColumn.float_column(name="european_aqi_pm2_5", non_nullable=True),
+        PandasColumn.float_column(name="european_aqi_pm10", non_nullable=True),
         PandasColumn.float_column(
-            name="pm10",
-            non_nullable=True    
+            name="european_aqi_nitrogen_dioxide", non_nullable=True
         ),
+        PandasColumn.float_column(name="european_aqi_ozone", non_nullable=True),
         PandasColumn.float_column(
-            name="pm2_5",
-            non_nullable=True    
+            name="european_aqi_sulphur_dioxide", non_nullable=True
         ),
-        PandasColumn.float_column(
-            name="carbon_monoxide",
-            non_nullable=True    
-        ),
-        PandasColumn.float_column(
-            name="nitrogen_dioxide",
-            non_nullable=True    
-        ),
-        PandasColumn.float_column(
-            name="sulphur_dioxide",
-            non_nullable=True
-        ),
-        PandasColumn.float_column(
-            name="dust",
-            non_nullable=True
-        ),
-        PandasColumn.float_column(
-            name="european_aqi",
-            non_nullable=True
-        ),
-        PandasColumn.float_column(
-            name="european_aqi_pm2_5",
-            non_nullable=True    
-        ),
-        PandasColumn.float_column(
-            name="european_aqi_pm10",
-            non_nullable=True    
-        ),
-        PandasColumn.float_column(
-            name="european_aqi_nitrogen_dioxide",
-            non_nullable=True    
-        ),
-        PandasColumn.float_column(
-            name="european_aqi_ozone",
-            non_nullable=True    
-        ),
-        PandasColumn.float_column(
-            name="european_aqi_sulphur_dioxide",
-            non_nullable=True
-        )
-    ]
+    ],
 )
-@op(ins={"start": In(bool)},out=Out(WeatherDataFrame))
+
+
+@op(ins={"start": In(bool)}, out=Out(WeatherDataFrame))
 def transform_weather(start) -> pd.DataFrame:
     client = MongoClient(mongo_connect)
     projectdb_mongo = client["projectdb_mongo"]
@@ -398,7 +331,7 @@ def transform_weather(start) -> pd.DataFrame:
     weather_df = pd.DataFrame(list(weather_collection.find({})))
 
     weather_df["date"] = pd.to_datetime(weather_df["date"])
-    weather_df['_id'] = weather_df['_id'].astype(int)
+    weather_df["_id"] = weather_df["_id"].astype(int)
 
     weather_df = weather_df[
         (weather_df["date"] >= "2023-01-01") & (weather_df["date"] < "2024-01-01")
@@ -406,7 +339,7 @@ def transform_weather(start) -> pd.DataFrame:
     return weather_df
 
 
-@op(ins={"start": In(bool)},out=Out(AqiDataFrame))
+@op(ins={"start": In(bool)}, out=Out(AqiDataFrame))
 def transform_aqi(start) -> pd.DataFrame:
     client = MongoClient(mongo_connect)
     projectdb_mongo = client["projectdb_mongo"]
@@ -416,7 +349,7 @@ def transform_aqi(start) -> pd.DataFrame:
     aqi_df = pd.DataFrame(list(aqi_collection.find({})))
 
     aqi_df["date"] = pd.to_datetime(aqi_df["date"])
-    aqi_df['_id'] = aqi_df['_id'].astype(int)
+    aqi_df["_id"] = aqi_df["_id"].astype(int)
     # Filtering data from 2023-01-01 to 2023-12-31
     aqi_df = aqi_df[(aqi_df["date"] >= "2023-01-01") & (aqi_df["date"] < "2024-01-01")]
 
@@ -429,7 +362,7 @@ def transform_footfall(start) -> pd.DataFrame:
     projectdb_mongo = client["projectdb_mongo"]
     aqi_collection = projectdb_mongo["footfall_collection"]
     footfall_df = pd.DataFrame(list(aqi_collection.find({})))
-    footfall_df['_id'] = footfall_df['_id'].astype(int)
+    footfall_df["_id"] = footfall_df["_id"].astype(int)
     # Cleaning data removing all variables with more than 80% Null Values
     threshold = 0.8
     missing_percentage = footfall_df.isna().sum() / len(footfall_df)
@@ -440,8 +373,12 @@ def transform_footfall(start) -> pd.DataFrame:
 
 
 @op(
-    ins={"weather_df": In(WeatherDataFrame), "aqi_df": In(AqiDataFrame),"footfall_df": In(pd.DataFrame)},
-    out=Out(pd.DataFrame)
+    ins={
+        "weather_df": In(WeatherDataFrame),
+        "aqi_df": In(AqiDataFrame),
+        "footfall_df": In(pd.DataFrame),
+    },
+    out=Out(pd.DataFrame),
 )
 def join_data(weather_df, aqi_df, footfall_df) -> pd.DataFrame:
     aqi_df = aqi_df.drop("date", axis=1)
@@ -451,6 +388,8 @@ def join_data(weather_df, aqi_df, footfall_df) -> pd.DataFrame:
     )
 
     return merged_df
+
+
 @op()
 def load_df(merged_df) -> bool:
     postgres_engine = create_engine(postgres_connect)
@@ -465,13 +404,14 @@ def load_df(merged_df) -> bool:
         )
         log.info("{} records loaded".format(row_count))
         return True
+
+
 @job()
 def etl():
-        load_df(
-            join_data(
-                transform_weather(extract_weather()),
-                transform_aqi(extract_air_quality_index()),
-                transform_footfall(extract_footfall()),
-            )
+    load_df(
+        join_data(
+            transform_weather(extract_weather()),
+            transform_aqi(extract_aqi()),
+            transform_footfall(extract_footfall()),
         )
-
+    )
