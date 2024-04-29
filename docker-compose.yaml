@@ -1,4 +1,3 @@
-version: '3'
 name: team_aa_dap_2024
 services:
 
@@ -16,9 +15,6 @@ services:
       - ./output:/main/storage
     environment:
       POSTGRES_HOST: postgres_database
-    configs:
-      - source: dagster.yaml
-        target: /main/dagster.yaml
 
   ## MONGODB
 
@@ -103,22 +99,28 @@ services:
       - ./analysis:/main
     ports:
       - 8888:8888
+      - 5066:5006
     environment:
       POSTGRES_HOST: postgres_database
     container_name: jupyter_notebook
     command: "start-notebook.sh --NotebookApp.token="
+
+  ## DASHBORAD
+
+  dashboard:
+    container_name: dashboard
+    build:
+      context: .
+      dockerfile: ./dashboard/Dockerfile
+    volumes:
+      - ./dashboard:/dashboard
+    ports:
+      - 5006:5006
+    environment:
+      POSTGRES_HOST: postgres_database
   ## CONFIGS
 
 configs:
-  dagster.yaml:
-    content: |
-      telemetry:
-        enabled: false
-
-      python_logs:
-        managed_python_loggers:
-          - logger
-
   pgpass:
     content: postgres_database:5432:*:${USER}:${PASSWORD}
   servers.json:
