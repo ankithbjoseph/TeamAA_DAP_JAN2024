@@ -391,7 +391,7 @@ def join_data(weather_df, aqi_df, footfall_df) -> pd.DataFrame:
 
 
 @op()
-def load_df(merged_df) -> bool:
+def load_data(merged_df) -> bool:
     postgres_engine = create_engine(postgres_connect)
 
     with postgres_engine.connect() as conn:
@@ -408,7 +408,7 @@ def load_df(merged_df) -> bool:
 
 @job()
 def etl():
-    load_df(
+    load_data(
         join_data(
             transform_weather(extract_weather()),
             transform_aqi(extract_aqi()),

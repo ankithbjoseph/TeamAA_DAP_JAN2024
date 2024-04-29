@@ -1,0 +1,9 @@
+pandas
+pendulum
+sqlalchemy
+numpy
+psycopg2-binary
+bokeh
+jupyter_bokeh
+panel 
+watchfiles
