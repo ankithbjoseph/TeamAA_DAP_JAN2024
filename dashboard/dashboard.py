@@ -1,6 +1,5 @@
 import panel as pn
 import pandas as pd
-from sqlalchemy import create_engine
 import os
 import warnings
 from sqlalchemy import create_engine, text, exc
