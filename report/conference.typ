@@ -26,7 +26,7 @@
       email: "x23121424@student.ncirl.ie"
     ),
   ),
-  index-terms: ("A", "B", "C", "D"),
+  index-terms: ("Weather", "Air Quality Index", "Pedestrian Footfall", "MongoDB", "PostgreSQL", "Docker", "Dagster", "ETL- Extract Transform Load",),
   bibliography-file: "refs.bib",
 )
 
