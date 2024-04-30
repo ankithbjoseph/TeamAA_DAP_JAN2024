@@ -14,7 +14,7 @@
     (
       name: "Ankith Babu Joseph",
       department: [Msc in Data Analytics],
-      organization: [AffilNational College of Ireland],
+      organization: [National College of Ireland],
       location: [Dublin, Ireland],
       email: "x23185813@student.ncirl.ie"
     ),

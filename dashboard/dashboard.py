@@ -8,6 +8,8 @@ import pandas.io.sql as sqlio
 from bokeh.plotting import figure
 import datetime as dt
 from bokeh.models import LinearAxis, Range1d
+import folium
+from folium.plugins import MarkerCluster
 
 # Apply the CSS class to Panel components
 pn.extension()
@@ -15,6 +17,139 @@ pn.extension()
 postgres_host = os.getenv("POSTGRES_HOST", "localhost")
 warnings.filterwarnings("ignore", category=UserWarning)
 postgres_connect = f"postgresql://dap:dap@{postgres_host}:5432/projectdb"
+
+data = {
+    "Counter Locations": [
+        "Henry Street/Coles Lane/Dunnes",
+        "O'Connell st/Princes st North",
+        "Mary st/Jervis st",
+        "Capel st/Mary street",
+        "Aston Quay/Fitzgeralds",
+        "Grafton Street/CompuB",
+        "Talbot st/Guineys",
+        "D'olier st/Burgh Quay",
+        "Dame Street/Londis",
+        "Talbot st/Murrays Pharmacy",
+        "O'Connell St/Parnell St/AIB",
+        "Grafton Street / Nassau Street / Suffolk Street",
+        "College Green/Bank Of Ireland",
+        "O'Connell St/Pennys Pedestrian",
+        "Grafton st/Monsoon",
+        "Westmoreland Street East/Fleet street",
+        "Dawson Street/Molesworth Pedestrian",
+        "Liffey st/Halfpenny Bridge",
+        "Westmoreland Street West/Carrolls",
+        "College Green/Church Lane",
+        "College st/Westmoreland st",
+        "Bachelors walk/Bachelors way",
+        "Baggot st lower/Wilton tce inbound",
+        "Baggot st upper/Mespil rd/Bank",
+        "Grand Canal st upp/Clanwilliam place",
+        "Grand Canal st upp/Clanwilliam place/Google",
+        "Newcomen Bridge/Charleville mall inbound",
+        "Newcomen Bridge/Charleville mall outbound",
+        "North Wall Quay/Samuel Beckett bridge East",
+        "North Wall Quay/Samuel Beckett bridge West",
+        "Phibsborough Rd/Enniskerry Road",
+        "Phibsborough Rd/Munster St (Removed due to Overcounting)",
+        "Richmond st south/Portabello Harbour inbound",
+        "Richmond st south/Portabello Harbour outbound",
+    ],
+    "Latitude": [
+        53.34973,
+        53.34902,
+        53.34877,
+        53.34842,
+        53.34662,
+        53.34337,
+        53.35054,
+        53.3469,
+        53.34424,
+        53.35012,
+        53.352317,
+        53.34352,
+        53.34505,
+        53.34874,
+        53.34082,
+        53.34554,
+        53.341194,
+        53.34687,
+        53.346347,
+        53.344263,
+        53.345099,
+        53.347199,
+        53.33448,
+        53.33385,
+        53.33851,
+        53.33851,
+        53.35645,
+        53.35648,
+        53.346,
+        53.34748,
+        53.36334,
+        53.36322,
+        53.33034,
+        53.33023,
+    ],
+    "Longitude": [
+        -6.2609,
+        -6.26005,
+        -6.26674,
+        -6.26918,
+        -6.25982,
+        -6.25898,
+        -6.25528,
+        -6.25872,
+        -6.26116,
+        -6.2577,
+        -6.261675,
+        -6.25912,
+        -6.25939,
+        -6.26011,
+        -6.26035,
+        -6.25919,
+        -6.258337,
+        -6.26335,
+        -6.259197,
+        -6.260774,
+        -6.258778,
+        -6.260863,
+        -6.24577,
+        -6.24469,
+        -6.2379,
+        -6.239,
+        -6.24418,
+        -6.24418,
+        -6.24173,
+        -6.24132,
+        -6.27187,
+        -6.27247,
+        -6.26427,
+        -6.26397,
+    ],
+}
+
+# Convert data to DataFrame
+df = pd.DataFrame(data)
+
+
+# Function to create map HTML
+def create_map():
+    # Create a map centered around Dublin
+    map_center = [53.349805, -6.26031]  # Dublin coordinates
+    m = folium.Map(location=map_center, zoom_start=13)
+
+    # Add marker cluster to improve performance for a large number of markers
+    marker_cluster = MarkerCluster().add_to(m)
+
+    # Add markers for each counter location
+    for idx, row in df.iterrows():
+        folium.Marker(
+            location=[row["Latitude"], row["Longitude"]],
+            tooltip=row["Counter Locations"],
+        ).add_to(marker_cluster)
+
+    return m
 
 
 def get_dataset():
@@ -65,14 +200,14 @@ def create_scatter_plot(column, location, daterange):
             data_frame = sqlio.read_sql_query(text(query_string), connection)
 
         # Bokeh visualization tools
-        TOOLS = "crosshair,pan,wheel_zoom,zoom_in,zoom_out,reset,save,"
+        tools = "crosshair,pan,wheel_zoom,zoom_in,zoom_out,reset,save,"
 
         # Create a Bokeh figure
         p = figure(
             title=f"{column} vs Pedestrian Traffic at {location}",
             x_axis_label=f"{column}",
             y_axis_label="Pedestrian Traffic Count",
-            tools=TOOLS,
+            tools=tools,
             min_width=800,
         )
 
@@ -92,7 +227,17 @@ def create_scatter_plot(column, location, daterange):
         print("Database error:", db_error)
 
 
-def create_line_plot(var, loc, daterange):
+def create_line_plot(var, loc, daterange, avgby):
+    match avgby:
+        case "Daily":
+            avgd = "D"
+        case "Monthly":
+            avgd = "ME"
+        case "Weekly":
+            avgd = "W"
+        case _:
+            avgd = "D"
+
     try:
         (start_date, end_date) = daterange
         query_string = f"""
@@ -106,13 +251,16 @@ def create_line_plot(var, loc, daterange):
             data_frame = sqlio.read_sql_query(text(query_string), connection)
         data_frame["date"] = pd.to_datetime(data_frame["date"])
         data_frame.set_index("date", inplace=True)
-        monthly_avg_data = data_frame.resample("ME").mean()
+        monthly_avg_data = data_frame.resample(avgd).mean()
+
+        tools = "crosshair,pan,wheel_zoom,zoom_in,zoom_out,reset,save,"
 
         # Bokeh plot setup
         p = figure(
             x_axis_type="datetime",
             title=f"Distribution of {var} and footfall at {loc}",
             min_width=800,
+            tools=tools,
         )
         p.xaxis.axis_label = "Date"
         p.yaxis.axis_label = "Pedestrian count"
@@ -136,7 +284,7 @@ def create_line_plot(var, loc, daterange):
             monthly_avg_data[loc],
             line_color="green",
             y_range_name="y1",
-            legend_label=loc,
+            legend_label="Pedestrian count",
         )
 
         p.legend.location = "top_left"
@@ -210,6 +358,11 @@ locations = [
 
 
 #############################
+button_4 = pn.widgets.Button(
+    name="Project Report",
+    button_type="primary",
+    styles={"width": "100%"},
+)
 button_3 = pn.widgets.Button(
     name="Distribution of variables",
     button_type="primary",
@@ -232,21 +385,17 @@ button_0 = pn.widgets.Button(
 )
 
 
-sidebar = pn.Column(
-    button_0,
-    button_2,
-    button_1,
-    button_3,
-    styles={"width": "100%", "padding": "15px"},
-)
-
 button_0.on_click(lambda event: show_page("page_0"))
 button_1.on_click(lambda event: show_page("page_1"))
 button_2.on_click(lambda event: show_page("page_2"))
 button_3.on_click(lambda event: show_page("page_3"))
+button_4.on_click(lambda event: show_page("page_4"))
 
 
 def createpage_0():
+    # Create Panel app
+    map_viewer = pn.pane.plot.Folium(create_map(), height=400)
+
     page = pn.Column(
         pn.Row(pn.pane.Markdown("# Introduction")),
         pn.Row(
@@ -315,6 +464,7 @@ def createpage_0():
                                  
                                  """),
         ),
+        pn.Row(map_viewer),
     )
 
     return page
@@ -323,19 +473,19 @@ def createpage_0():
 def createpage_1():
     parameter_column = pn.widgets.Select(name="Parameter", options=list(parameters))
     location_column = pn.widgets.Select(name="Location", options=list(locations))
-    datetime_range_picker = pn.widgets.DatetimeRangePicker(
-        name="Datetime Range",
+    date_range_slider = pn.widgets.DateRangeSlider(
+        name="Date Range",
         start=dt.datetime(2023, 1, 1, 00, 00),
         end=dt.datetime(2023, 12, 31, 23, 59),
         value=(dt.datetime(2023, 1, 1, 00, 00), dt.datetime(2023, 12, 31, 23, 59)),
-        enable_seconds=False,
+        step=1,
     )
 
     # Interactive plots
     @pn.depends(
         parameter_column.param.value,
         location_column.param.value,
-        datetime_range_picker.param.value,
+        date_range_slider.param.value,
     )
     def update_scatter(column, location, daterange):
         return create_scatter_plot(column, location, daterange)
@@ -343,7 +493,12 @@ def createpage_1():
     # Layout
     page = pn.FlexBox(
         pn.Column(update_scatter),
-        pn.Column(parameter_column, location_column, datetime_range_picker),
+        pn.Column(
+            parameter_column,
+            location_column,
+            date_range_slider,
+            width=300,
+        ),
         flex_direction="row",
         flex_wrap="nowrap",
         justify_content="space-evenly",
@@ -378,20 +533,39 @@ def createpage_3():
         value=(dt.datetime(2023, 1, 1, 00, 00), dt.datetime(2023, 12, 31, 23, 59)),
         step=1,
     )
+    toggle_group = pn.widgets.ToggleGroup(
+        name="Averageby",
+        options=["Daily", "Weekly", "Monthly"],
+        behavior="radio",
+        button_type="light",
+    )
 
     # Interactive plots
     @pn.depends(
         parameter_column.param.value,
         location_column.param.value,
         date_range_slider.param.value,
+        toggle_group.param.value,
     )
-    def update_line(column, location, daterange):
-        return create_line_plot(column, location, daterange)
+    def update_line(column, location, daterange, avgby):
+        return create_line_plot(
+            column,
+            location,
+            daterange,
+            avgby,
+        )
 
     # Layout
     page = pn.FlexBox(
         pn.Column(update_line),
-        pn.Column(parameter_column, location_column, date_range_slider),
+        pn.Column(
+            parameter_column,
+            location_column,
+            date_range_slider,
+            pn.pane.HTML("Average by:"),
+            toggle_group,
+            width=300,
+        ),
         flex_direction="row",
         flex_wrap="nowrap",
         justify_content="space-evenly",
@@ -402,14 +576,36 @@ def createpage_3():
     return page
 
 
+def createpage_4():
+    pdf_pane = pn.pane.PDF("dashboard\conference.pdf", width=1200, height=600)
+    return pdf_pane
+
+
 mapping = {
     "page_0": createpage_0(),
     "page_1": createpage_1(),
     "page_2": createpage_2(),
     "page_3": createpage_3(),
+    "page_4": createpage_4(),
 }
 
-main_area = pn.Column(mapping["page_3"])
+main_area = pn.Column(mapping["page_0"], width=1200)
+sidebar = pn.Column(
+    button_0,
+    button_2,
+    button_1,
+    button_3,
+    button_4,
+    pn.layout.Divider(margin=(220, 0, 0, 0)),
+    pn.pane.Markdown("""
+                     **© DAP PROJECT JAN 2024 TEAM AA**
+
+                        - Ankith Babu Joseph- x23185813
+                        - Alphons Zacharia James- x23169702
+                        - Abhilash Janardhanan- x23121424
+                     """),
+    styles={"width": "100%", "padding": "15px"},
+)
 
 
 def show_page(page_key):
@@ -421,8 +617,7 @@ dashboard = pn.template.MaterialTemplate(
     title="Dashboard - Exploring the impact of environmental factors on pedestrian footfall in Dublin city",
     sidebar=[sidebar],
     main=[main_area],
-    busy_indicator=None,
-    sidebar_width=280,
+    sidebar_width=300,
 )
 
 # Serve the Panel app
