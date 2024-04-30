@@ -382,6 +382,7 @@ def transform_footfall(start) -> pd.DataFrame:
 )
 def join_data(weather_df, aqi_df, footfall_df) -> pd.DataFrame:
     aqi_df = aqi_df.drop("date", axis=1)
+    footfall_df = footfall_df.drop("Time", axis=1)
     dfs = [weather_df, aqi_df, footfall_df]
     merged_df = reduce(
         lambda left, right: pd.merge(left, right, on="_id", how="inner"), dfs
