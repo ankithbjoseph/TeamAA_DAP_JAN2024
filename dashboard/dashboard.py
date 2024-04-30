@@ -6,16 +6,43 @@ import warnings
 from sqlalchemy import create_engine, text, exc
 import pandas.io.sql as sqlio
 from bokeh.plotting import figure
+import datetime as dt
 
-# Configure Panel to run in a notebook if applicable
-pn.extension(template='fast')
+# Apply the CSS class to Panel components
+pn.extension()
 
 postgres_host = os.getenv("POSTGRES_HOST", "localhost")
 warnings.filterwarnings("ignore", category=UserWarning)
 postgres_connect = f"postgresql://dap:dap@{postgres_host}:5432/projectdb"
 
 
-def create_scatter_plot(column, location, rain):
+def get_dataset():
+    try:
+        query_string = """
+        SELECT 
+            *
+        FROM 
+            weather_aqi_footfall
+        limit 
+            20
+        """
+
+        # Connect to the PostgreSQL database
+        engine = create_engine(postgres_connect)
+        # Run the query and return the results as a data frame
+        data_frame = pd.DataFrame()
+        with engine.connect() as connection:
+            data_frame = sqlio.read_sql_query(text(query_string), connection)
+
+        return data_frame
+
+    except exc.SQLAlchemyError as db_error:
+        print("Database error:", db_error)
+
+
+def create_scatter_plot(column, location, daterange):
+    (start_date, end_date) = daterange
+
     try:
         query_string = f"""
         SELECT 
@@ -24,8 +51,10 @@ def create_scatter_plot(column, location, rain):
             "{location}" AS pedestrian_traffic
         FROM 
             weather_aqi_footfall
-        where
-        rain = {rain}
+            
+        WHERE date >= '{start_date.strftime("%Y-%m-%d %H:%M:%S")}' 
+        AND date <= '{end_date.strftime("%Y-%m-%d %H:%M:%S")}'
+
         """
 
         # Connect to the PostgreSQL database
@@ -35,7 +64,7 @@ def create_scatter_plot(column, location, rain):
             data_frame = sqlio.read_sql_query(text(query_string), connection)
 
         # Bokeh visualization tools
-        TOOLS = "hover,crosshair,pan,wheel_zoom,zoom_in,zoom_out,box_zoom,reset,tap,save,box_select,poly_select,lasso_select"
+        TOOLS = "crosshair,pan,wheel_zoom,zoom_in,zoom_out,reset,save,"
 
         # Create a Bokeh figure
         p = figure(
@@ -49,7 +78,7 @@ def create_scatter_plot(column, location, rain):
         p.scatter(
             x=data_frame[column],
             y=data_frame["pedestrian_traffic"],
-            size=10,  # Dot size
+            size=5,  # Dot size
             line_color="navy",
             fill_alpha=0.6,
         )
@@ -99,17 +128,12 @@ locations = [
     "College st/Westmoreland st",
     "D'olier st/Burgh Quay",
     "Dame Street/Londis",
-    "Dawson Street",
-    "Dawson Street old",
-    "Dawson Street/Molesworth",
     "Grafton st/Monsoon",
     "Grafton Street / Nassau Street / Suffolk Street",
     "Grafton Street/CompuB",
     "Grand Canal st upp/Clanwilliam place",
     "Grand Canal st upp/Clanwilliam place/Google",
     "Henry Street/Coles Lane/Dunnes",
-    "Liffey st/Halfpenny Bridge",
-    "Liffey Street old",
     "Mary st/Jervis st",
     "Newcomen Bridge/Charleville mall inbound",
     "Newcomen Bridge/Charleville mall outbound",
@@ -118,33 +142,188 @@ locations = [
     "O'Connell St/Parnell St/AIB",
     "O'Connell St/Pennys Pedestrian",
     "O'Connell st/Princes st North",
-    "O'Connell Street Pennys - PYRO EVO Temporary Counter",
     "Phibsborough Rd/Enniskerry Road",
-    "Phibsborough Rd/Munster St (Removed due to Overcounting)",
     "Richmond st south/Portabello Harbour inbound",
     "Richmond st south/Portabello Harbour outbound",
     "Talbot st/Guineys",
-    "Talbot st/Murrays Pharmacy",
     "Westmoreland Street East/Fleet street",
     "Westmoreland Street West/Carrolls",
 ]
 
-parameter_column = pn.widgets.Select(name="Parameter", options=list(parameters))
-location_column = pn.widgets.Select(name="Location", options=list(locations))
-rain = pn.widgets.Switch(name="Switch")
-rain_text = pn.widgets.StaticText(value="Rain : ")
 
-
-# Interactive plots
-@pn.depends(parameter_column.param.value, location_column.param.value, rain.param.value)
-def update_scatter(column, location, rain):
-    return create_scatter_plot(column, location, int(rain))
-
-
-# Layout
-dashboard = pn.Column(
-    pn.Row(parameter_column, location_column, rain_text, rain), pn.Row(update_scatter)
+#############################
+button_1 = pn.widgets.Button(
+    name="Relationship b/w variables",
+    button_type="primary",
+    styles={"width": "100%"},
+)
+button_2 = pn.widgets.Button(
+    name="Dataset",
+    button_type="primary",
+    styles={"width": "100%"},
+)
+button_0 = pn.widgets.Button(
+    name="Introduction",
+    button_type="primary",
+    styles={"width": "100%"},
 )
 
-# Display the dashboard
+
+sidebar = pn.Column(
+    button_0,
+    button_2,
+    button_1,
+    styles={"width": "100%", "padding": "15px"},
+)
+
+button_0.on_click(lambda event: show_page("page_0"))
+button_1.on_click(lambda event: show_page("page_1"))
+button_2.on_click(lambda event: show_page("page_2"))
+
+
+def createpage_0():
+    page = pn.Column(
+        pn.Row(pn.pane.Markdown("# Introduction")),
+        pn.Row(
+            pn.pane.Markdown("""
+                                ### Enviornmental variables
+                                - **_id**: Unique identifier for each data entry.
+                                - **date**: Date and time of the recorded data.
+                                - **temperature_2m**: Temperature at 2 meters above ground level in Celsius.
+                                - **relative_humidity_2m**: Relative humidity at 2 meters above ground level, expressed as a percentage.
+                                - **dew_point_2m**: Dew point temperature at 2 meters above ground level in Celsius.
+                                - **apparent_temperature**: Perceived temperature, taking into account factors like humidity and wind, in Celsius.
+                                - **precipitation**: Total precipitation in millimeters.
+                                - **rain**: Amount of rainfall in millimeters.
+                                - **snowfall**: Amount of snowfall in millimeters.
+                                - **weather_code**: Numerical code representing the weather conditions.
+                                - **cloud_cover**: Percentage of sky covered by clouds.
+                                - **wind_speed_10m**: Wind speed at 10 meters above ground level in meters per second.
+                                - **wind_direction_10m**: Wind direction at 10 meters above ground level in degrees.
+                                - **is_day**: Binary indicator (0 or 1) indicating whether it's daytime.
+                                - **sunshine_duration**: Duration of sunshine in minutes.
+                                - **pm10**: Particulate Matter (PM10) concentration in micrograms per cubic meter.
+                                - **pm2_5**: Particulate Matter (PM2.5) concentration in micrograms per cubic meter.
+                                - **carbon_monoxide**: Carbon Monoxide (CO) concentration in micrograms per cubic meter.
+                                - **nitrogen_dioxide**: Nitrogen Dioxide (NO2) concentration in micrograms per cubic meter.
+                                - **sulphur_dioxide**: Sulphur Dioxide (SO2) concentration in micrograms per cubic meter.
+                                - **dust**: Dust concentration in micrograms per cubic meter.
+                                - **european_aqi**: European Air Quality Index (AQI) calculated based on various pollutant concentrations.
+                                - **european_aqi_pm2_5**: European AQI specifically calculated for PM2.5.
+                                - **european_aqi_pm10**: European AQI specifically calculated for PM10.
+                                - **european_aqi_nitrogen_dioxide**: European AQI specifically calculated for nitrogen dioxide (NO2).
+                                - **european_aqi_ozone**: European AQI specifically calculated for ozone (O3).
+                                - **european_aqi_sulphur_dioxide**: European AQI specifically calculated for sulphur dioxide (SO2).
+                                """),
+            pn.pane.Markdown("""
+                                 ### Counter Locations
+                                - Aston Quay/Fitzgeralds
+                                - Bachelors walk/Bachelors way
+                                - Baggot st lower/Wilton tce inbound
+                                - Baggot st upper/Mespil rd/Bank
+                                - Capel st/Mary street
+                                - College Green/Bank Of Ireland
+                                - College Green/Church Lane
+                                - College st/Westmoreland st
+                                - D'olier st/Burgh Quay
+                                - Dame Street/Londis
+                                - Grafton st/Monsoon
+                                - Grafton Street / Nassau Street / Suffolk Street
+                                - Grafton Street/CompuB
+                                - Grand Canal st upp/Clanwilliam place
+                                - Grand Canal st upp/Clanwilliam place/Google
+                                - Henry Street/Coles Lane/Dunnes
+                                - Mary st/Jervis st
+                                - Newcomen Bridge/Charleville mall inbound
+                                - Newcomen Bridge/Charleville mall outbound
+                                - North Wall Quay/Samuel Beckett bridge East
+                                - North Wall Quay/Samuel Beckett bridge West
+                                - O'Connell St/Parnell St/AIB
+                                - O'Connell St/Pennys Pedestrian
+                                - O'Connell st/Princes st North
+                                - Phibsborough Rd/Enniskerry Road
+                                - Richmond st south/Portabello Harbour inbound
+                                - Richmond st south/Portabello Harbour outbound
+                                - Talbot st/Guineys
+                                - Westmoreland Street East/Fleet street
+                                - Westmoreland Street West/Carrolls
+                                 
+                                 """),
+        ),
+    )
+
+    return page
+
+
+def createpage_1():
+    parameter_column = pn.widgets.Select(name="Parameter", options=list(parameters))
+    location_column = pn.widgets.Select(name="Location", options=list(locations))
+    datetime_range_picker = pn.widgets.DatetimeRangePicker(
+        name="Datetime Range",
+        start=dt.datetime(2023, 1, 1, 00, 00),
+        end=dt.datetime(2023, 12, 31, 23, 59),
+        value=(dt.datetime(2023, 1, 1, 00, 00), dt.datetime(2023, 12, 31, 23, 59)),
+        enable_seconds=False,
+    )
+
+    # Interactive plots
+    @pn.depends(
+        parameter_column.param.value,
+        location_column.param.value,
+        datetime_range_picker.param.value,
+    )
+    def update_scatter(column, location, daterange):
+        return create_scatter_plot(column, location, daterange)
+
+    # Layout
+    page = pn.FlexBox(
+        pn.Column(update_scatter),
+        pn.Column(parameter_column, location_column, datetime_range_picker),
+        flex_direction="row",
+        flex_wrap="nowrap",
+        justify_content="space-evenly",
+        align_content="stretch",
+        sizing_mode="stretch_width",
+    )
+
+    return page
+
+
+def createpage_2():
+    df = get_dataset()
+    page = pn.Column(
+        pn.Row(
+            pn.pane.Markdown("""## Dataset Explorer
+                         (First 20 rows of the data)
+                         """),
+        ),
+        pn.Column(pn.pane.DataFrame(df), height=500),
+        align="center",
+    )
+    return page
+
+
+mapping = {
+    "page_0": createpage_0(),
+    "page_1": createpage_1(),
+    "page_2": createpage_2(),
+}
+
+main_area = pn.Column(mapping["page_0"])
+
+
+def show_page(page_key):
+    main_area.clear()
+    main_area.append(mapping[page_key])
+
+
+dashboard = pn.template.MaterialTemplate(
+    title="Dashboard - Exploring the impact of environmental factors on pedestrian footfall in Dublin city",
+    sidebar=[sidebar],
+    main=[main_area],
+    busy_indicator=None,
+    sidebar_width=280,
+)
+
+# Serve the Panel app
 dashboard.servable()
