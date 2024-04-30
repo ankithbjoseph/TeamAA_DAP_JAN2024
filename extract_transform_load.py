@@ -42,7 +42,6 @@ def extract_weather() -> bool:
             "cloud_cover",
             "wind_speed_10m",
             "wind_direction_10m",
-            "is_day",
             "sunshine_duration",
         ],
         "timeformat": "unixtime",
@@ -74,7 +73,6 @@ def extract_weather() -> bool:
         hourly_cloud_cover = hourly.Variables(8).ValuesAsNumpy()
         hourly_wind_speed_10m = hourly.Variables(9).ValuesAsNumpy()
         hourly_wind_direction_10m = hourly.Variables(10).ValuesAsNumpy()
-        hourly_is_day = hourly.Variables(11).ValuesAsNumpy()
         hourly_sunshine_duration = hourly.Variables(12).ValuesAsNumpy()
 
         hourly_data = {
@@ -96,7 +94,6 @@ def extract_weather() -> bool:
         hourly_data["cloud_cover"] = hourly_cloud_cover
         hourly_data["wind_speed_10m"] = hourly_wind_speed_10m
         hourly_data["wind_direction_10m"] = hourly_wind_direction_10m
-        hourly_data["is_day"] = hourly_is_day
         hourly_data["sunshine_duration"] = hourly_sunshine_duration
 
         hourly_dataframe = pd.DataFrame(data=hourly_data)
@@ -286,7 +283,6 @@ WeatherDataFrame = create_dagster_pandas_dataframe_type(
         PandasColumn.float_column(name="cloud_cover", non_nullable=True),
         PandasColumn.float_column(name="wind_speed_10m", non_nullable=True),
         PandasColumn.float_column(name="wind_direction_10m", non_nullable=True),
-        PandasColumn.float_column(name="is_day", non_nullable=True),
         PandasColumn.float_column(name="sunshine_duration", non_nullable=True),
     ],
 )

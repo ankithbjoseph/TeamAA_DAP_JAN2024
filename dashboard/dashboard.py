@@ -577,7 +577,7 @@ def createpage_3():
 
 
 def createpage_4():
-    pdf_pane = pn.pane.PDF("dashboard\conference.pdf", width=1200, height=600)
+    pdf_pane = pn.pane.PDF("dashboard\conference.pdf", width=1100, height=600)
     return pdf_pane
 
 
@@ -589,7 +589,7 @@ mapping = {
     "page_4": createpage_4(),
 }
 
-main_area = pn.Column(mapping["page_0"], width=1200)
+main_area = pn.Column(mapping["page_0"], width=1100)
 sidebar = pn.Column(
     button_0,
     button_2,
