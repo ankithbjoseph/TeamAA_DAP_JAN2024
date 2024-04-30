@@ -7,6 +7,7 @@ from sqlalchemy import create_engine, text, exc
 import pandas.io.sql as sqlio
 from bokeh.plotting import figure
 import datetime as dt
+from bokeh.models import LinearAxis, Range1d
 
 # Apply the CSS class to Panel components
 pn.extension()
@@ -72,6 +73,7 @@ def create_scatter_plot(column, location, daterange):
             x_axis_label=f"{column}",
             y_axis_label="Pedestrian Traffic Count",
             tools=TOOLS,
+            min_width=800,
         )
 
         # Create a scatter plot
@@ -85,6 +87,62 @@ def create_scatter_plot(column, location, daterange):
 
         # Show the visualization
         return p
+
+    except exc.SQLAlchemyError as db_error:
+        print("Database error:", db_error)
+
+
+def create_line_plot(var, loc, daterange):
+    try:
+        (start_date, end_date) = daterange
+        query_string = f"""
+            SELECT date, {var}, "{loc}"
+            FROM weather_aqi_footfall
+            WHERE date >= '{start_date.strftime("%Y-%m-%d %H:%M:%S")}' 
+            AND date <= '{end_date.strftime("%Y-%m-%d %H:%M:%S")}'
+            """
+        engine = create_engine(postgres_connect)
+        with engine.connect() as connection:
+            data_frame = sqlio.read_sql_query(text(query_string), connection)
+        data_frame["date"] = pd.to_datetime(data_frame["date"])
+        data_frame.set_index("date", inplace=True)
+        monthly_avg_data = data_frame.resample("ME").mean()
+
+        # Bokeh plot setup
+        p = figure(
+            x_axis_type="datetime",
+            title=f"Distribution of {var} and footfall at {loc}",
+            min_width=800,
+        )
+        p.xaxis.axis_label = "Date"
+        p.yaxis.axis_label = "Pedestrian count"
+        # Second y-axis with different scale
+        p.extra_y_ranges = {
+            "y1": Range1d(start=0, end=monthly_avg_data[loc].max() * 1.1),
+            "y2": Range1d(start=0, end=monthly_avg_data[var].max() * 1.1),
+        }
+        # p.add_layout(LinearAxis(y_range_name="y1", axis_label=f"{loc}"), "left")
+        p.add_layout(LinearAxis(y_range_name="y2", axis_label=f"{var}"), "right")
+
+        p.line(
+            monthly_avg_data.index,
+            monthly_avg_data[var],
+            line_color="blue",
+            y_range_name="y2",
+            legend_label=var,
+        )
+        p.line(
+            monthly_avg_data.index,
+            monthly_avg_data[loc],
+            line_color="green",
+            y_range_name="y1",
+            legend_label=loc,
+        )
+
+        p.legend.location = "top_left"
+        p.legend.click_policy = "hide"
+
+        return p  # Show the plot
 
     except exc.SQLAlchemyError as db_error:
         print("Database error:", db_error)
@@ -152,6 +210,11 @@ locations = [
 
 
 #############################
+button_3 = pn.widgets.Button(
+    name="Distribution of variables",
+    button_type="primary",
+    styles={"width": "100%"},
+)
 button_1 = pn.widgets.Button(
     name="Relationship b/w variables",
     button_type="primary",
@@ -173,12 +236,14 @@ sidebar = pn.Column(
     button_0,
     button_2,
     button_1,
+    button_3,
     styles={"width": "100%", "padding": "15px"},
 )
 
 button_0.on_click(lambda event: show_page("page_0"))
 button_1.on_click(lambda event: show_page("page_1"))
 button_2.on_click(lambda event: show_page("page_2"))
+button_3.on_click(lambda event: show_page("page_3"))
 
 
 def createpage_0():
@@ -303,13 +368,48 @@ def createpage_2():
     return page
 
 
+def createpage_3():
+    parameter_column = pn.widgets.Select(name="Parameter", options=list(parameters))
+    location_column = pn.widgets.Select(name="Location", options=list(locations))
+    date_range_slider = pn.widgets.DateRangeSlider(
+        name="Date Range",
+        start=dt.datetime(2023, 1, 1, 00, 00),
+        end=dt.datetime(2023, 12, 31, 23, 59),
+        value=(dt.datetime(2023, 1, 1, 00, 00), dt.datetime(2023, 12, 31, 23, 59)),
+        step=1,
+    )
+
+    # Interactive plots
+    @pn.depends(
+        parameter_column.param.value,
+        location_column.param.value,
+        date_range_slider.param.value,
+    )
+    def update_line(column, location, daterange):
+        return create_line_plot(column, location, daterange)
+
+    # Layout
+    page = pn.FlexBox(
+        pn.Column(update_line),
+        pn.Column(parameter_column, location_column, date_range_slider),
+        flex_direction="row",
+        flex_wrap="nowrap",
+        justify_content="space-evenly",
+        align_content="stretch",
+        sizing_mode="stretch_width",
+    )
+
+    return page
+
+
 mapping = {
     "page_0": createpage_0(),
     "page_1": createpage_1(),
     "page_2": createpage_2(),
+    "page_3": createpage_3(),
 }
 
-main_area = pn.Column(mapping["page_0"])
+main_area = pn.Column(mapping["page_3"])
 
 
 def show_page(page_key):
