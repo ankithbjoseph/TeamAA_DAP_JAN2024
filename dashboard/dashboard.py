@@ -329,7 +329,7 @@ def createpage_0():
                                  
                                  """),
         ),
-        pn.Row(map_viewer),
+        pn.Column(pn.pane.Markdown("# Counter location"), pn.Row(map_viewer)),
     )
 
     return page
