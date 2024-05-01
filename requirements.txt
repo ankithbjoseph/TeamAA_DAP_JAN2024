@@ -16,3 +16,4 @@ bokeh
 jupyter_bokeh
 panel 
 watchfiles
+folium

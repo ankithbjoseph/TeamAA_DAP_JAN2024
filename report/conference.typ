@@ -63,10 +63,10 @@ The significance of this study lies in its potential to contribute to the sustai
 The study employs a structured Knowledge Discovery in Databases (KDD) lifecycle, ensuring a systematic approach from data gathering to knowledge extraction. The refined KDD lifecycle, as depicted in the updated @a, consists of the following stages:
 
 A. Data Selection:
-The initial stage involves selecting the appropriate datasets. Pedestrian footfall data is collated from historical records in CSV format, while real-time weather and air quality data are extracted via APIs from openmeteo. This bifurcated approach allows for the integration of comprehensive data types - historical and real-time.
+The initial stage involves selecting the appropriate datasets. Pedestrian footfall data is collated from historical records in CSV format, while historical weather and air quality data are extracted via APIs from openmeteo. This bifurcated approach allows for the integration of comprehensive data types - historical.
 
 B. Storage and Preprocessing/Transformation:
-Upon collection, the data is stored and processed. MongoDB, a NoSQL database, is utilized for its efficiency in handling large volumes of unstructured or semi-structured data. Python scripts are then employed for preprocessing and transformation tasks, cleaning the data and converting it into a unified format conducive to analysis.
+Upon collection, the data is stored in MongoDB, a NoSQL database which is utilized for its efficiency in handling large volumes of unstructured or semi-structured data. Python scripts are then employed for preprocessing and transformation tasks, cleaning the data and converting it into a unified format conducive to analysis.
 
 C. Storage and Visualizations:
 Post-transformation, the data is loaded into a PostgreSQL database, an SQL database renowned for its robust data warehousing and complex querying capabilities. This transition marks a shift towards more intensive data analysis and the subsequent creation of visualizations.
