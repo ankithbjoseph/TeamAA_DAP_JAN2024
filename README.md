@@ -7,27 +7,31 @@ Team members
 3. Abhilash Janardhanan- x23121424
 
 
-Getting Started....
 
-Requirments :Up and running docker desktop in your local PC: https://www.docker.com/products/docker-desktop/
+### Getting Started....
 
-Extract the compressed folder DAP Project_AA.zip
+Requirments :
+Up and running docker desktop in your local PC: [Docker](https://www.docker.com/products/docker-desktop/)
 
-Rename ".env.sample" file contain authentication details to ".env"
+Extract the compressed folder **DAP Project_AA.zip**
 
-initiate Command Prompt and navigate to  extracted folder DAP Project_AA on your Windows system
+Rename ```.env.sample```  to ```.env``` to set your enviornment variables
 
-execute  command :    docker compose up -d
+initiate Command Prompt and navigate to  extracted folder DAP Project_AA on your system
+
+execute  command :    
+
+```docker compose up -d```
 
 After building all the containers terminal will be detached and docker containers will be running
 
 Navigate to container tab in docker 
 
-open port of container "dagster etl" 3000:3000/copy url http://localhost:3000/locations/__repository__etl@extract_transform_load.py/jobs/etl 
+View **dagster etl** at  [http://localhost:3000/](http://localhost:3000/)
 
-Run launchpad (ETL job will starts executing)
+Open launchpad and run the job (ETL job will starts executing)
 
 once etl run gets completed 
 
-open from docker container "dashboard" open port 5006:5006 /copy url (http://localhost:5006/dashboard) 
+view the **dashboard** at [http://localhost:5006/dashboard](http://localhost:5006/dashboard) 
 
