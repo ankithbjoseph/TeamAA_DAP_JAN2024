@@ -250,7 +250,9 @@ def create_line_plot(var, loc, daterange, avgby):
             data_frame = sqlio.read_sql_query(text(query_string), connection)
         data_frame["date"] = pd.to_datetime(data_frame["date"])
         data_frame.set_index("date", inplace=True)
-        monthly_avg_data = data_frame.resample(avgd).mean()
+        avg_data = data_frame.resample(avgd).mean()
+
+        print(avg_data)
 
         tools = "crosshair,pan,wheel_zoom,zoom_in,zoom_out,reset,save,"
 
@@ -262,27 +264,29 @@ def create_line_plot(var, loc, daterange, avgby):
             tools=tools,
         )
         p.xaxis.axis_label = "Date"
-        p.yaxis.axis_label = "Pedestrian count"
+        p.y_range = Range1d(start=0, end=avg_data[var].max() * 1.1)
+        p.yaxis.axis_label = f"{var}"
+
         # Second y-axis with different scale
         p.extra_y_ranges = {
-            "y1": Range1d(start=0, end=monthly_avg_data[loc].max() * 1.1),
-            "y2": Range1d(start=0, end=monthly_avg_data[var].max() * 1.1),
+            "y2": Range1d(start=0, end=avg_data[loc].max() * 1.1),
         }
-        # p.add_layout(LinearAxis(y_range_name="y1", axis_label=f"{loc}"), "left")
-        p.add_layout(LinearAxis(y_range_name="y2", axis_label=f"{var}"), "right")
+
+        p.add_layout(
+            LinearAxis(y_range_name="y2", axis_label="Pedestrian count"), "right"
+        )
 
         p.line(
-            monthly_avg_data.index,
-            monthly_avg_data[var],
+            avg_data.index,
+            avg_data[var],
             line_color="blue",
-            y_range_name="y2",
             legend_label=var,
         )
         p.line(
-            monthly_avg_data.index,
-            monthly_avg_data[loc],
+            avg_data.index,
+            avg_data[loc],
             line_color="green",
-            y_range_name="y1",
+            y_range_name="y2",
             legend_label="Pedestrian count",
         )
 
@@ -576,7 +580,7 @@ def createpage_3():
 
 
 def createpage_4():
-    pdf_pane = pn.pane.PDF("dashboard\conference.pdf", width=1100, height=600)
+    pdf_pane = pn.pane.PDF("conference.pdf", width=1190, height=600)
     return pdf_pane
 
 
@@ -588,7 +592,7 @@ mapping = {
     "page_4": createpage_4(),
 }
 
-main_area = pn.Column(mapping["page_0"], width=1100)
+main_area = pn.Column(mapping["page_0"], width=1190)
 sidebar = pn.Column(
     button_0,
     button_2,
