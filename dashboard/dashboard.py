@@ -577,7 +577,7 @@ def createpage_3():
 
 
 def createpage_4():
-    pdf_pane = pn.pane.PDF("dashboard\conference.pdf", width=1200, height=600)
+    pdf_pane = pn.pane.PDF("conference.pdf", width=1200, height=600)
     return pdf_pane
 
 
