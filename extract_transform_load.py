@@ -38,11 +38,9 @@ def extract_weather() -> bool:
             "precipitation",
             "rain",
             "snowfall",
-            "weather_code",
             "cloud_cover",
             "wind_speed_10m",
             "wind_direction_10m",
-            "is_day",
             "sunshine_duration",
         ],
         "timeformat": "unixtime",
@@ -57,10 +55,6 @@ def extract_weather() -> bool:
         responses = openmeteo.weather_api(url, params=params)
 
         response = responses[0]
-        print(f"Coordinates {response.Latitude()}°N {response.Longitude()}°E")
-        print(f"Elevation {response.Elevation()} m asl")
-        print(f"Timezone {response.Timezone()} {response.TimezoneAbbreviation()}")
-        print(f"Timezone difference to GMT+0 {response.UtcOffsetSeconds()} s")
 
         hourly = response.Hourly()
         hourly_temperature_2m = hourly.Variables(0).ValuesAsNumpy()
@@ -70,12 +64,10 @@ def extract_weather() -> bool:
         hourly_precipitation = hourly.Variables(4).ValuesAsNumpy()
         hourly_rain = hourly.Variables(5).ValuesAsNumpy()
         hourly_snowfall = hourly.Variables(6).ValuesAsNumpy()
-        hourly_weather_code = hourly.Variables(7).ValuesAsNumpy()
-        hourly_cloud_cover = hourly.Variables(8).ValuesAsNumpy()
-        hourly_wind_speed_10m = hourly.Variables(9).ValuesAsNumpy()
-        hourly_wind_direction_10m = hourly.Variables(10).ValuesAsNumpy()
-        hourly_is_day = hourly.Variables(11).ValuesAsNumpy()
-        hourly_sunshine_duration = hourly.Variables(12).ValuesAsNumpy()
+        hourly_cloud_cover = hourly.Variables(7).ValuesAsNumpy()
+        hourly_wind_speed_10m = hourly.Variables(8).ValuesAsNumpy()
+        hourly_wind_direction_10m = hourly.Variables(9).ValuesAsNumpy()
+        hourly_sunshine_duration = hourly.Variables(10).ValuesAsNumpy()
 
         hourly_data = {
             "date": pd.date_range(
@@ -92,11 +84,9 @@ def extract_weather() -> bool:
         hourly_data["precipitation"] = hourly_precipitation
         hourly_data["rain"] = hourly_rain
         hourly_data["snowfall"] = hourly_snowfall
-        hourly_data["weather_code"] = hourly_weather_code
         hourly_data["cloud_cover"] = hourly_cloud_cover
         hourly_data["wind_speed_10m"] = hourly_wind_speed_10m
         hourly_data["wind_direction_10m"] = hourly_wind_direction_10m
-        hourly_data["is_day"] = hourly_is_day
         hourly_data["sunshine_duration"] = hourly_sunshine_duration
 
         hourly_dataframe = pd.DataFrame(data=hourly_data)
@@ -157,10 +147,6 @@ def extract_aqi() -> bool:
 
         # Process first location. Add a for-loop for multiple locations or weather models
         response = responses[0]
-        print(f"Coordinates {response.Latitude()}°N {response.Longitude()}°E")
-        print(f"Elevation {response.Elevation()} m asl")
-        print(f"Timezone {response.Timezone()} {response.TimezoneAbbreviation()}")
-        print(f"Timezone difference to GMT+0 {response.UtcOffsetSeconds()} s")
 
         # Process hourly data. The order of variables needs to be the same as requested.
         hourly = response.Hourly()
@@ -282,11 +268,9 @@ WeatherDataFrame = create_dagster_pandas_dataframe_type(
         PandasColumn.float_column(name="precipitation", non_nullable=True),
         PandasColumn.float_column(name="rain", non_nullable=True),
         PandasColumn.float_column(name="snowfall", non_nullable=True),
-        PandasColumn.float_column(name="weather_code", non_nullable=True),
         PandasColumn.float_column(name="cloud_cover", non_nullable=True),
         PandasColumn.float_column(name="wind_speed_10m", non_nullable=True),
         PandasColumn.float_column(name="wind_direction_10m", non_nullable=True),
-        PandasColumn.float_column(name="is_day", non_nullable=True),
         PandasColumn.float_column(name="sunshine_duration", non_nullable=True),
     ],
 )
@@ -295,11 +279,11 @@ AqiDataFrame = create_dagster_pandas_dataframe_type(
     columns=[
         PandasColumn.integer_column(
             name="_id",
-            non_nullable=True,  # specify that the column shouldn't contain NAs
+            non_nullable=True,  
         ),
         PandasColumn.datetime_column(
             name="date",
-            non_nullable=True,  # specify that the column shouldn't contain NAs
+            non_nullable=True,  
         ),
         PandasColumn.float_column(name="pm10", non_nullable=True),
         PandasColumn.float_column(name="pm2_5", non_nullable=True),
