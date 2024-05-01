@@ -82,8 +82,8 @@ locations = [
 ]
 
 parameters = [
-    ["_id"],
-    ["date"],
+    ["_id",""],
+    ["date",""],
     ["temperature_2m", "°C"],
     ["relative_humidity_2m", "%"],
     ["dew_point_2m", "°C"],
@@ -100,10 +100,10 @@ parameters = [
     ["nitrogen_dioxide", "μg/m³"],
     ["sulphur_dioxide", "μg/m³"],
     ["dust", "μg/m³"],
-    ["european_aqi"],
-    ["european_aqi_pm2_5"],
-    ["european_aqi_pm10"],
-    ["european_aqi_nitrogen_dioxide"],
-    ["european_aqi_ozone"],
-    ["european_aqi_sulphur_dioxide"]
+    ["european_aqi",""],
+    ["european_aqi_pm2_5",""],
+    ["european_aqi_pm10",""],
+    ["european_aqi_nitrogen_dioxide",""],
+    ["european_aqi_ozone",""],
+    ["european_aqi_sulphur_dioxide",""]
 ]
