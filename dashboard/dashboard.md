@@ -28,12 +28,12 @@
 
 ### Counter Locations
 - Aston Quay/Fitzgeralds
-- Bachelors walk/Bachelors way
+- ~~Bachelors walk/Bachelors way~~
 - Baggot st lower/Wilton tce inbound
 - Baggot st upper/Mespil rd/Bank
 - Capel st/Mary street
 - College Green/Bank Of Ireland
-- College Green/Church Lane
+- ~~College Green/Church Lane~~ **loss of data from 5-9th month**
 - College st/Westmoreland st
 - D'olier st/Burgh Quay
 - Dame Street/Londis
@@ -42,18 +42,41 @@
 - Grafton Street/CompuB
 - Grand Canal st upp/Clanwilliam place
 - Grand Canal st upp/Clanwilliam place/Google
-- Henry Street/Coles Lane/Dunnes
+- ~~Henry Street/Coles Lane/Dunnes~~ **loss of data 5-9month**
 - Mary st/Jervis st
-- Newcomen Bridge/Charleville mall inbound
-- Newcomen Bridge/Charleville mall outbound
+- ~~Newcomen Bridge/Charleville mall inbound~~
+- ~~Newcomen Bridge/Charleville mall outbound~~
 - North Wall Quay/Samuel Beckett bridge East
 - North Wall Quay/Samuel Beckett bridge West
-- O'Connell St/Parnell St/AIB
-- O'Connell St/Pennys Pedestrian
+- ~~O'Connell St/Parnell St/AIB~~ **5-9 month**
+- ~~O'Connell St/Pennys Pedestrian~~ **1-5month**
 - O'Connell st/Princes st North
-- Phibsborough Rd/Enniskerry Road
+- **Phibsborough Rd/Enniskerry Road** can use this for conclusion
 - Richmond st south/Portabello Harbour inbound
 - Richmond st south/Portabello Harbour outbound
-- Talbot st/Guineys
-- Westmoreland Street East/Fleet street
-- Westmoreland Street West/Carrolls
+- ~~Talbot st/Guineys~~
+- ~~Westmoreland Street East/Fleet street~~ **loss of data from 9th month**
+- ~~Westmoreland Street West/Carrolls~~
+
+locations = [
+    "Aston Quay/Fitzgeralds",
+    "Baggot st lower/Wilton tce inbound",
+    "Baggot st upper/Mespil rd/Bank",
+    "Capel st/Mary street",
+    "College Green/Bank Of Ireland",
+    "College st/Westmoreland st",
+    "D'olier st/Burgh Quay",
+    "Dame Street/Londis",
+    "Grafton st/Monsoon",
+    "Grafton Street / Nassau Street / Suffolk Street",
+    "Grafton Street/CompuB",
+    "Grand Canal st upp/Clanwilliam place",
+    "Grand Canal st upp/Clanwilliam place/Google",
+    "Mary st/Jervis st",
+    "North Wall Quay/Samuel Beckett bridge East",
+    "North Wall Quay/Samuel Beckett bridge West",
+    "O'Connell st/Princes st North",
+    "Phibsborough Rd/Enniskerry Road can use this for conclusion",
+    "Richmond st south/Portabello Harbour inbound",
+    "Richmond st south/Portabello Harbour outbound"
+]
