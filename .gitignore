@@ -166,3 +166,4 @@ test.ipynb
 .cache.sqlite
 output
 analysis/analysistest.ipynb
+analysis/analysistest.py
