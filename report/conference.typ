@@ -57,29 +57,37 @@ The primary aim of this study is to elucidate the interconnections between envir
 The significance of this study lies in its potential to contribute to the sustainable development of urban areas, enhancing the well-being of residents and promoting environmentally friendly urban planning practices. As cities continue to grow, the need to integrate environmental health with urban design becomes increasingly important, making studies like this one vital for future urban development strategies【3】.
 
 
+= Related Work
+In this paper we explore the intersection of urban footfall and environmental factors in Dublin city using datadriven approaches to analyse pedestrian traffic patterns. Our work is informed by similar studies in the field, each contributing different insights into how urban environments influence pedestrian behaviors and wellbeing.
 
+One such study conducted by Anita Ratnasari Rakhmatulloh, Diah Intan Kusumo Dewi, and Dinar Mutiara Kusumo Nugraheni in Semarang, Indonesia, focused on how urban design influences pedestrian activity. They employed ArcGIS for spatial mapping and SPSS for data analysis, concluding that pedestrian frequency is higher in areas with diverse attractions and well-planned spaces. These findings align with our investigation into Dublin's urban layout, reinforcing the importance of strategic urban planning in enhancing pedestrian experiences and environmental quality.@Rakhmatulloh_2021
+
+Similarly a study by Babatunde Olasunkanmi Folasayo and Abimbola A. Babatunde examined the impact of environmental pollution on pedestrians in Lagos, Nigeria. They utilized the Thermo Scientific MIE pDR-1500 instrument to measure air quality across 20 local government areas, finding that six areas exceeded acceptable pollution standards. The results, substantiated by a one-sample T-test with a t-value of 22.226, underscore the significant effect of air pollution on pedestrian health and underscore the need for urgent governmental interventions like restricted vehicle hours and enhanced urban greenery.@Onifade_2022 
 
 = Methodology
-The study employs a structured Knowledge Discovery in Databases (KDD) lifecycle, ensuring a systematic approach from data gathering to knowledge extraction. The refined KDD lifecycle, as depicted in the updated @a, consists of the following stages:
+The study employs a structured Knowledge Discovery in Databases (KDD) lifecycle ensuring a systematic approach from data gathering to knowledge extraction. The refined KDD lifecycle, as depicted in the updated @a, consists of the following stages:
 
-A. Data Selection:
-The initial stage involves selecting the appropriate datasets. Pedestrian footfall data is collated from historical records in CSV format, while historical weather and air quality data are extracted via APIs from openmeteo. This bifurcated approach allows for the integration of comprehensive data types - historical.
+== *Data Selection:*
+The first step in our study is choosing the right datasets. We use historical pedestrian footfall data whihc is collected from SmartDublin in CSV format along with historical weather and air quality data, which we gather through APIs from OpenMeteo. This two approach allows us to combine different types of data therby giving us a clear picture of historical trends. This method make sure that we have a rich dataset that captures both the human activity in urban spaces and the environmental conditions they experience.
 
-B. Storage and Preprocessing/Transformation:
+== *Storage and Preprocessing/Transformation:*
 Upon collection, the data is stored in MongoDB, a NoSQL database which is utilized for its efficiency in handling large volumes of unstructured or semi-structured data. Python scripts are then employed for preprocessing and transformation tasks, cleaning the data and converting it into a unified format conducive to analysis.
 
-C. Storage and Visualizations:
+== *Storage and Visualizations:*
 Post-transformation, the data is loaded into a PostgreSQL database, an SQL database renowned for its robust data warehousing and complex querying capabilities. This transition marks a shift towards more intensive data analysis and the subsequent creation of visualizations.
 
-D. Knowledge:
+== *Knowledge:*
 The culmination of the process is the extraction of actionable knowledge. Data visualizations translate complex datasets into interpretable graphics, facilitating insight generation and supporting decision-making processes.
-
-The iterative nature of this KDD lifecycle fosters the refinement of analysis methods, ensuring the research remains closely aligned with the defined objectives. The entire process, meticulously detailed in Figure 1, underscores the commitment to extracting meaningful and actionable knowledge from vast datasets.
 
 #figure(
       image("images/graphviz.png"),
       caption: [KDD],
     )<a>
+
+The iterative nature of this KDD lifecycle fosters the refinement of analysis methods, ensuring the research remains closely aligned with the defined objectives. The entire process, meticulously detailed in Figure 1, underscores the commitment to extracting meaningful and actionable knowledge from vast datasets.
+
+== *Technologies:*
+In our database and analytical programming project a variety of technologies are used to simplify data processing and analysis. We organised our coding efforts to maximize efficiency and maintainability using python's adaptability and strength. In python we incooperated several libraries like Pandas, dagster, Pymongo, sqlalchemy, bokeh, Panel etc for scripting the analysis. The central orchestration tool for our workflow is Dagster which seamlessly facilitates the Extract, Transform, Load (ETL) process. The dagster guarantees the orchestrated flow of data throughout the various stages. MongoDB a robust NoSQL database is used to store the raw data that are extracted from API calls and csv file read. We used MongoDB over other because of its document-oriented approach which simplifies data representation thereby reducing development complexity. PostgreSQL which is reliable relational database known for its superior querying capabilities and structured data management is to store the data after wrangling and merging processes which is used for further analysis. PostgreSQL is our first preference as it ensures robust ACID compliance, data integrity and reliability even in complex transactional scenarios. We integrated mongo-express and PG admin within the environment for visually interacting with databases. We wrapped our whole setup in Docker containers to ensure portability and uniformity across several computer settings. By merging these tools, we were able to establish a robust database management and analytical programming ecosystem capable of providing effective data driven insights.
 = Result Analysis
 
 = Recommendations and Conclusions
