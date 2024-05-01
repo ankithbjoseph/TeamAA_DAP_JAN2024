@@ -279,11 +279,11 @@ AqiDataFrame = create_dagster_pandas_dataframe_type(
     columns=[
         PandasColumn.integer_column(
             name="_id",
-            non_nullable=True,  
+            non_nullable=True,
         ),
         PandasColumn.datetime_column(
             name="date",
-            non_nullable=True,  
+            non_nullable=True,
         ),
         PandasColumn.float_column(name="pm10", non_nullable=True),
         PandasColumn.float_column(name="pm2_5", non_nullable=True),
@@ -366,7 +366,31 @@ def transform_footfall(start) -> pd.DataFrame:
 )
 def join_data(weather_df, aqi_df, footfall_df) -> pd.DataFrame:
     aqi_df = aqi_df.drop("date", axis=1)
-    footfall_df = footfall_df.drop("Time", axis=1)
+    footfall_df = footfall_df[
+        [
+            "_id",
+            "Aston Quay/Fitzgeralds",
+            "Baggot st lower/Wilton tce inbound",
+            "Baggot st upper/Mespil rd/Bank",
+            "Capel st/Mary street",
+            "College Green/Bank Of Ireland",
+            "College st/Westmoreland st",
+            "D'olier st/Burgh Quay",
+            "Dame Street/Londis",
+            "Grafton st/Monsoon",
+            "Grafton Street / Nassau Street / Suffolk Street",
+            "Grafton Street/CompuB",
+            "Grand Canal st upp/Clanwilliam place",
+            "Grand Canal st upp/Clanwilliam place/Google",
+            "Mary st/Jervis st",
+            "North Wall Quay/Samuel Beckett bridge East",
+            "North Wall Quay/Samuel Beckett bridge West",
+            "O'Connell st/Princes st North",
+            "Phibsborough Rd/Enniskerry Road",
+            "Richmond st south/Portabello Harbour inbound",
+            "Richmond st south/Portabello Harbour outbound",
+        ]
+    ]
     dfs = [weather_df, aqi_df, footfall_df]
     merged_df = reduce(
         lambda left, right: pd.merge(left, right, on="_id", how="inner"), dfs

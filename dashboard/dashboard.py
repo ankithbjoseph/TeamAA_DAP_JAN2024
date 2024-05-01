@@ -204,7 +204,7 @@ def create_scatter_plot(column, location, daterange):
         # Create a Bokeh figure
         p = figure(
             title=f"{column} vs Pedestrian Traffic at {location}",
-            x_axis_label=f"{column}",
+            x_axis_label=f"{column} ({parameters_dict[column]})",
             y_axis_label="Pedestrian Traffic Count",
             tools=tools,
             min_width=800,
@@ -265,7 +265,7 @@ def create_line_plot(var, loc, daterange, avgby):
         )
         p.xaxis.axis_label = "Date"
         p.y_range = Range1d(start=0, end=avg_data[var].max() * 1.1)
-        p.yaxis.axis_label = f"{var}"
+        p.yaxis.axis_label = f"{var} ({parameters_dict[var]})"
 
         # Second y-axis with different scale
         p.extra_y_ranges = {
@@ -299,41 +299,36 @@ def create_line_plot(var, loc, daterange, avgby):
         print("Database error:", db_error)
 
 
-parameters = [
-    "temperature_2m",
-    "relative_humidity_2m",
-    "dew_point_2m",
-    "apparent_temperature",
-    "precipitation",
-    "rain",
-    "snowfall",
-    "weather_code",
-    "cloud_cover",
-    "wind_speed_10m",
-    "wind_direction_10m",
-    "is_day",
-    "sunshine_duration",
-    "pm10",
-    "pm2_5",
-    "carbon_monoxide",
-    "nitrogen_dioxide",
-    "sulphur_dioxide",
-    "dust",
-    "european_aqi",
-    "european_aqi_pm2_5",
-    "european_aqi_pm10",
-    "european_aqi_nitrogen_dioxide",
-    "european_aqi_ozone",
-    "european_aqi_sulphur_dioxide",
-]
+parameters_dict = {
+    "temperature_2m": "°C",
+    "relative_humidity_2m": "%",
+    "dew_point_2m": "°C",
+    "apparent_temperature": "°C",
+    "precipitation": "mm",
+    "rain": "mm",
+    "snowfall": "cm",
+    "cloud_cover": "%",
+    "wind_speed_10m": "km/h",
+    "sunshine_duration": "Seconds",
+    "pm10": "μg/m³",
+    "pm2_5": "μg/m³",
+    "carbon_monoxide": "μg/m³",
+    "nitrogen_dioxide": "μg/m³",
+    "sulphur_dioxide": "μg/m³",
+    "dust": "μg/m³",
+    "european_aqi": "",
+    "european_aqi_pm2_5": "",
+    "european_aqi_pm10": "",
+    "european_aqi_nitrogen_dioxide": "",
+    "european_aqi_ozone": "",
+    "european_aqi_sulphur_dioxide": "",
+}
 locations = [
     "Aston Quay/Fitzgeralds",
-    "Bachelors walk/Bachelors way",
     "Baggot st lower/Wilton tce inbound",
     "Baggot st upper/Mespil rd/Bank",
     "Capel st/Mary street",
     "College Green/Bank Of Ireland",
-    "College Green/Church Lane",
     "College st/Westmoreland st",
     "D'olier st/Burgh Quay",
     "Dame Street/Londis",
@@ -342,21 +337,13 @@ locations = [
     "Grafton Street/CompuB",
     "Grand Canal st upp/Clanwilliam place",
     "Grand Canal st upp/Clanwilliam place/Google",
-    "Henry Street/Coles Lane/Dunnes",
     "Mary st/Jervis st",
-    "Newcomen Bridge/Charleville mall inbound",
-    "Newcomen Bridge/Charleville mall outbound",
     "North Wall Quay/Samuel Beckett bridge East",
     "North Wall Quay/Samuel Beckett bridge West",
-    "O'Connell St/Parnell St/AIB",
-    "O'Connell St/Pennys Pedestrian",
     "O'Connell st/Princes st North",
-    "Phibsborough Rd/Enniskerry Road",
+    "Phibsborough Rd/Enniskerry Road can use this for conclusion",
     "Richmond st south/Portabello Harbour inbound",
     "Richmond st south/Portabello Harbour outbound",
-    "Talbot st/Guineys",
-    "Westmoreland Street East/Fleet street",
-    "Westmoreland Street West/Carrolls",
 ]
 
 
@@ -474,7 +461,9 @@ def createpage_0():
 
 
 def createpage_1():
-    parameter_column = pn.widgets.Select(name="Parameter", options=list(parameters))
+    parameter_column = pn.widgets.Select(
+        name="Parameter", options=list(parameters_dict.keys())
+    )
     location_column = pn.widgets.Select(name="Location", options=list(locations))
     date_range_slider = pn.widgets.DateRangeSlider(
         name="Date Range",
@@ -527,7 +516,9 @@ def createpage_2():
 
 
 def createpage_3():
-    parameter_column = pn.widgets.Select(name="Parameter", options=list(parameters))
+    parameter_column = pn.widgets.Select(
+        name="Parameter", options=list(parameters_dict.keys())
+    )
     location_column = pn.widgets.Select(name="Location", options=list(locations))
     date_range_slider = pn.widgets.DateRangeSlider(
         name="Date Range",
@@ -551,12 +542,7 @@ def createpage_3():
         toggle_group.param.value,
     )
     def update_line(column, location, daterange, avgby):
-        return create_line_plot(
-            column,
-            location,
-            daterange,
-            avgby,
-        )
+        return create_line_plot(column, location, daterange, avgby)
 
     # Layout
     page = pn.FlexBox(
