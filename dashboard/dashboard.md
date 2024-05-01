@@ -80,3 +80,30 @@ locations = [
     "Richmond st south/Portabello Harbour inbound",
     "Richmond st south/Portabello Harbour outbound"
 ]
+
+parameters = [
+    ["_id"],
+    ["date"],
+    ["temperature_2m", "°C"],
+    ["relative_humidity_2m", "%"],
+    ["dew_point_2m", "°C"],
+    ["apparent_temperature", "°C"],
+    ["precipitation", "mm"],
+    ["rain", "mm"],
+    ["snowfall", "cm"],
+    ["cloud_cover", "%"],
+    ["wind_speed_10m", "km/h"],
+    ["sunshine_duration", "Seconds"],
+    ["pm10", "μg/m³"],
+    ["pm2_5", "μg/m³"],
+    ["carbon_monoxide", "μg/m³"],
+    ["nitrogen_dioxide", "μg/m³"],
+    ["sulphur_dioxide", "μg/m³"],
+    ["dust", "μg/m³"],
+    ["european_aqi"],
+    ["european_aqi_pm2_5"],
+    ["european_aqi_pm10"],
+    ["european_aqi_nitrogen_dioxide"],
+    ["european_aqi_ozone"],
+    ["european_aqi_sulphur_dioxide"]
+]
