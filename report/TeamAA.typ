@@ -34,10 +34,12 @@
 In an era where urban spaces are highly monitored for efficiency and safety, understanding the dynamics of human mobility becomes very crucial. Pedestrian footfall data serves as a significant indicator of urban planning and economic activity thus offering insights into how people interact with environment under varying conditions. This research shows the intersection of environmental factors like weather conditions and air quality and pedestrian movement within urban places. Measure footfall is thus important for our project. Dublin city Council has placed Pyro Box @i at several places to collect footfall data.
 
 Recent advancements in data collection and analytics have enabled more detailed observations of urban environments therby allowing researchers to analyze patterns. The integration of big data technologies and analytical programming facilitates a deeper understanding of complex datasets, uncovering relationships that can inform public policy and urban planning.
+
 #figure(
-      image("images/sensor.jpeg"),
-      caption: [Pyro Box, Dublin (Source: )],
+      image("images/pyrobox.png"),
+      caption: [Pyro Box, Henry St, Dublin (Source: Google Maps )],
     )<i>
+
 
 == Research Objective
 The objective of this study is to do a visualization of the impact of environmental variables on pedestrian footfall. By using extensive datasets of weather patterns, air quality indices, and footfall across multiple urban locations, this paper aims to:
@@ -63,7 +65,8 @@ In our project we use a method called Knowledge Discovery in Databases (KDD) fir
 
 
 == *Data Selection:*
-The first step in our study is choosing the right datasets. We use historical pedestrian footfall data which is collected from SmartDublin in CSV format along with historical weather and air quality data, which we gather through APIs from OpenMeteo. This two approach allows us to combine different types of data therby giving us a clear picture of historical trends. This method make sure that we have a rich dataset that captures both the human activity in urban spaces and the environmental conditions they experience.
+The initial stage of our project involves selecting appropriate datasets. This process requires consideration of various factors like data quality and relevance. We use historical pedestrian footfall data which is collected from SmartDublin in CSV format along with historical weather and air quality data, which we gather through APIs from OpenMeteo. This two approach allows us to combine different types of data therby giving us a clear picture of historical trends. This method make sure that we have a rich dataset that captures both the human activity in urban spaces and the environmental conditions they experience.
+
 
 == *Storage and Preprocessing/Transformation:*
 Once we collect the data we store it in MongoDB, which is a type of NoSQL database known for its ability to efficiently manage large amounts of unstructured or semi-structured data. We then use Python scripts to prepare the data for analysis. This preparation involves cleaning the data to remove any irrelevant information by dropping columns where the precentage of null values or zero values in more than eighty, for others null values are replaced by imputing 0 to the respective columns. These null values or zero values maybe due to the improper working of the sensors. This step is crucial because it makes sure that the data is accurate and  organized therby setting the stage for reliable analysis and insights.
@@ -74,9 +77,9 @@ After preprocessing we transfer the cleaned and structured data into a PostgreSQ
 
 
 #table(
- columns: (auto, auto,),
+ columns: (40%, auto,),
   inset: 4pt,
-  align: center,
+  align: auto,
   [*Parameters*], [*Description (Unit)*],
 [id], [ Unique identifier for each data entry],
 [date], [Date and time of the recorded data.],
@@ -90,6 +93,14 @@ After preprocessing we transfer the cleaned and structured data into a PostgreSQ
 [cloud_cover(%)], [Percentage of sky covered by clouds],
 [wind_speed_10m(km/h)], [Wind speed at 10 meters above ground level in kilometers per hour],
 [sunshine_duration(Seconds):], [Duration of sunshine in seconds],
+  )
+<t1>\
+
+#table(
+ columns: (40%, auto,),
+  inset: 4pt,
+  align: auto,
+  [*Parameters*], [*Description (Unit)*],
 [pm10(μg/m³)], [Particulate Matter (PM10) concentration in micrograms per cubic meter.],
 [pm2_5(μg/m³)], [ Particulate Matter (PM2.5) concentration in micrograms per cubic meter],
 [carbon_monoxide(μg/m³)], [Carbon Monoxide (CO) concentration in micrograms per cubic meter],
@@ -103,7 +114,7 @@ After preprocessing we transfer the cleaned and structured data into a PostgreSQ
 [european_aqi_ozone], [European AQI specifically calculated for ozone (O3).],
 [european_aqi_sulphur_dioxide], [European AQI specifically calculated for sulphur dioxide (SO2)],
   )
-<t1>\
+<t2>\
 
 #table(
  columns: (auto, auto),
@@ -132,20 +143,20 @@ After preprocessing we transfer the cleaned and structured data into a PostgreSQ
 [20], [Richmond st south/Portabello Harbour outbound],
   )
 
-<t1>\
+<t3>\
 
+
+
+== *Knowledge:*
+The final goal of our process is to extract knowledge that can be used in decision making. We get this by converting complex data sets into clear, easyto understand visualizations. These graphs not only make it easier to spot patterns and insights therby making  informed decisions. These visualizations are explained in the next section "Data Visualization"
 
 #figure(
       image("images/graphviz.png"),
       caption: [KDD Lifecycle],
     )<a>
 
-
-== *Knowledge:*
-The final goal of our process is to extract knowledge that can be used in decision making. We get this by converting complex data sets into clear, easyto understand visualizations. These graphs not only make it easier to spot patterns and insights therby making  informed decisions. These visualizations are explained in the next section "Data Visualization"
-
 The way we use the Knowledge Discovery in Databases (KDD) lifecycle is iterative which means we continuously refine our methods of analysis. Each step of this process is carefully detailed in @a. This approach is about more than just processing data infact every step in our process builds upon the previous one.
-
+#v(15pt)
 == *Technologies:*
 In our database and analytical programming project a variety of technologies are used to simplify data processing and analysis. We organised our coding efforts to maximize efficiency and maintainability using python's adaptability and strength. In python we incooperated several libraries like Pandas, dagster, Pymongo, sqlalchemy, bokeh, Panel etc for scripting the analysis. The central orchestration tool for our workflow is Dagster which seamlessly facilitates the Extract, Transform, Load (ETL) process. The dagster guarantees the orchestrated flow of data throughout the various stages. MongoDB a robust NoSQL database is used to store the raw data that are extracted from API calls and csv file read. We used MongoDB over other because of its document-oriented approach which simplifies data representation thereby reducing development complexity. PostgreSQL which is reliable relational database known for its superior querying capabilities and structured data management is to store the data after wrangling and merging processes which is used for further analysis. PostgreSQL is our first preference as it ensures robust ACID compliance, data integrity and reliability even in complex transactional scenarios. We integrated mongo-express and PG admin within the environment for visually interacting with databases. We wrapped our whole setup in Docker containers to ensure portability and uniformity across several computer settings. By merging these tools, we were able to establish a robust database management and analytical programming ecosystem capable of providing effective data driven insights.
 
@@ -155,7 +166,7 @@ After loading the data successfully into PostgreSQL we have a created a dashboar
 
 == *Dashboard Features:*
 The introduction page shows the environmental variables and final counter locations. Dataset page which shows the combined sample dataset of weather, air quality and footfall. Relationship between variable shows a scatter plot with all the environmental varaibles and counter locations. The distribution of variables pages shows a line graph with all the environmental varaibles and counter locations. The project report page has our project report displayed. 
-
+#v(10pt)
 == *Pedestrian Traffic Distribution Using Bar Chart:*
 From the footfall dataset analysis we created a bar chart to visualise the average footfall at various locations across Dublin city thus revealing key pedestrian hotspots. This bar chart titled "Average Footfall by Location" @b clearly shows which areas experience the highest pedestrian traffic with locations like "Aston Quay/Fitzgeralds" and "Baggot st lower/Wilton tce inbound" leading in footfall. These insights can be crucial for urban planners and government authorities as they can design strategies to enhance urban mobility and optimize city spaces for better pedestrian flow and can also is a key metric to optimise your business performance in that locations. The visualization help to identify and address areas of high pedestrian activity thus helping in decision making processes related to urban development and infrastructure planning.
 
@@ -163,22 +174,22 @@ From the footfall dataset analysis we created a bar chart to visualise the avera
       image("images/Barchart.png"),
       caption: [Average Footfall by Location],
     )<b>
-
+#v(15pt)
 == *Environmental Impact On Footfall Using Scatter Plot:*
 The scatter plot "Temperature vs Pedestrian Traffic at College Green/Bank Of Ireland" @c shows a relatively dense clustering of points in the midrange of temperatures therby suggesting a potential correlation where footfall increases with moderate temperatures. The distribution is wide indicating fluctuations in footfall which could be due to other factors like time of day or specific events.
 
 #figure(
       image("images/collegegreen.png"),
-      caption: [college green],
+      caption: [temperature_2m vs Pedestrian Traffic at College Green/Bank Of Ireland],
     )<c>
-
-
+    
 The scatter plot "Temperature vs Pedestrian Traffic at Baggot St Upper/Mespil Rd/Bank" @d presents a very dense data points in the mid to higher temperature ranges which could suggest higher pedestrian activity in warmer conditions. This plot can serve as an excellent example to discuss the influence of pleasant weather on human mobility patterns.
 
 
+    
 #figure(
       image("images/Baggotst.png"),
-      caption: [baggot],
+      caption: [temperature_2m vs Pedestrian Traffic at Baggot st upper/Mespil rd/Bank],
     )<d>
 
 
@@ -196,26 +207,25 @@ The scatter plot for "European AQI PM2.5 vs Pedestrian Traffic at O'Connell St/P
 
 Similarly the scatter plot for "European AQI PM2.5 vs Pedestrian Traffic at College Green/Bank of Ireland" @f shows initially high density of data points at moderate levels of air pollution  which then decreases as the AQI increases beyond a certain point that cant be bearable. This indicates that pedestrian traffic remains stable up to a certain level of air pollution but as soon the air quality decreses the pedestrian traffic also decreses. These trends are again very important for city planning and public health improvements.
 
+
+== *Environmental Impact On Footfall Using Line Graph:*
+The graph showing the distribution of carbon monoxide and pedestrian traffic at Aston Quay/Fitzgeralds @g shows a interesting correlation, as carbon monoxide levels increase throughout the year so does the pedestrian count mainly peaking around September. This might suggests that if more pedestrians increase then vehicle activity might also increase in that area. This might be because both are interrealated and as vehicle increases  carbon monoxide emissions might also increase. Although this is just a hypothesis based on the observed data and generic understanding, it reflects the complex interaction between urban activity and environmental quality. Despite the decline in both carbon monoxide and pedestrian numbers towards the year's end—likely due to seasonal weather changes and reduced outdoor activities the area still remains a busy hub and thats possibly sustained by its business or residential appeal. This interesting relationship can be used for further investigation to fully understand these dynamics.
+
 #figure(
       image("images/colegegreemaqi.png"),
       caption: [European AQI PM2.5 vs Pedestrian Traffic at College Green/Bank of Ireland],
     )<f>
 
-== *Environmental Impact On Footfall Using Line Graph:*
-The graph showing the distribution of carbon monoxide and pedestrian traffic at Aston Quay/Fitzgeralds @g shows a interesting correlation, as carbon monoxide levels increase throughout the year so does the pedestrian count mainly peaking around September. This might suggests that if more pedestrians increase then vehicle activity might also increase in that area. This might be because both are interrealated and as vehicle increases  carbon monoxide emissions might also increase. Although this is just a hypothesis based on the observed data and generic understanding, it reflects the complex interaction between urban activity and environmental quality. Despite the decline in both carbon monoxide and pedestrian numbers towards the year's end—likely due to seasonal weather changes and reduced outdoor activities the area still remains a busy hub and thats possibly sustained by its business or residential appeal. This interesting relationship can be used for further investigation to fully understand these dynamics.
-
-
-
 Similarly second line graph shows how sunshine duration and pedestrian traffic corelate at College Green/Bank of Ireland . This graph shows a clear pattern as the sunshine increases and reaches its highest in July more people are out on the road which suggests that sunny days encourage outdoor activities in that area. As the year progresses and the amount of sunshine decreases and so does the number of pedestrians. This highlights how good weather can positively affects the amount of pedestrian traffic outside.
 
 #figure(
       image("images/carbon.png"),
-      caption: [Carbon Monoxide],
-    )<g>
-
+      caption: [Distribution of carbon_monoxide and footfall at Aston Quay/Fitzgeralds],
+    )<g> 
+Similarly second line graph shows how sunshine duration and pedestrian traffic corelate at College Green/Bank of Ireland . This graph shows a clear pattern as the sunshine increases and reaches its highest in July more people are out on the road which suggests that sunny days encourage outdoor activities in that area. As the year progresses and the amount of sunshine decreases and so does the number of pedestrians. This highlights how good weather can positively affects the amount of pedestrian traffic outside.
 #figure(
       image("images/sunshine.png"),
-      caption: [Sunshine],
+      caption: [Distribution of sunshine_duration and College Green/Bank Of Irelands],
     )<h>
 
 
