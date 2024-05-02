@@ -145,8 +145,6 @@ def create_line_plot(var, loc, daterange, avgby):
         data_frame.set_index("date", inplace=True)
         avg_data = data_frame.resample(avgd).mean()
 
-        print(avg_data)
-
         tools = "crosshair,pan,wheel_zoom,zoom_in,zoom_out,reset,save,"
 
         # Bokeh plot setup
