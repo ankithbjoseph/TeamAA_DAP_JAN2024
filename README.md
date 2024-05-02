@@ -13,13 +13,21 @@ Team members
 Requirments :
 Up and running docker engine in your local PC: [Docker](https://www.docker.com/products/docker-desktop/)
 
+start with cloning the repo
+
+``` git clone https://github.com/ankithbjoseph/TeamAA_DAP_JAN2024.git ```
+
+OR
+
 Extract the compressed contents to a folder 
 
 Rename ```.env.sample```  to ```.env``` to set your enviornment variables.
 
 initiate Command Prompt and navigate to  extracted folder  on your system
 
-execute  command :    
+``` cd .\TeamAA_DAP_JAN2024\ ```
+
+Set up the docker containers, execute  command :    
 
 ```docker compose up -d```
 
