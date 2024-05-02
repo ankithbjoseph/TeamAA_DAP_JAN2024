@@ -1,3 +1,4 @@
+# importing the required libraries.
 from dagster import op, Out, In, get_dagster_logger, job
 from pymongo import MongoClient, errors
 import openmeteo_requests
@@ -8,22 +9,34 @@ from sqlalchemy import create_engine
 from functools import reduce
 from dagster_pandas import PandasColumn, create_dagster_pandas_dataframe_type
 
-log = get_dagster_logger()
+log = get_dagster_logger()  # setting up dagster logger
+
 # Setup the Open-Meteo API client with cache and retry on error
 cache_session = requests_cache.CachedSession(".cache", expire_after=-1)
 retry_session = retry(cache_session, retries=5, backoff_factor=0.2)
 openmeteo = openmeteo_requests.Client(session=retry_session)
+
+# connectiion strings for the databases
+# base code taken from https://pypi.org/project/openmeteo-requests/ example code
 postgres_connect = "postgresql://dap:dap@postgres_database:5432/projectdb"
 mongo_connect = "mongodb://dap:dap@mongodb_database"
 # postgres_connect = "postgresql://dap:dap@127.0.0.1:5432/projectdb"
 # mongo_connect = "mongodb://dap:dap@127.0.0.1"
 
 
+# defining the function to extract weather
 @op(out=Out(bool))
 def extract_weather() -> bool:
+    """
+    This function fetches the weather data from the open-meteo api and dumps it to a mongodb database
+    returns a boolean value to indicate the success.
+    """
+
     result = True
-    # Make sure all required weather variables are listed here
-    # The order of variables in hourly or daily is important to assign them correctly below
+    # code for api call and retrival of the data is provided by the openmeteo https://open-meteo.com/en/docs/historical-weather-api
+    # minor changes are made to suite our project needs
+
+    # api call parameters defined
     url = "https://archive-api.open-meteo.com/v1/archive"
     params = {
         "latitude": 53.3331,
@@ -46,14 +59,21 @@ def extract_weather() -> bool:
         "timeformat": "unixtime",
         "timezone": "Europe/London",
     }
+
     try:
+        # establish the database connection
         client = MongoClient(mongo_connect)
         projectdb_mongo = client["projectdb_mongo"]
 
-        weather_collection = projectdb_mongo["weather_collection"]
+        weather_collection = projectdb_mongo[
+            "weather_collection"
+        ]  # create a collection to store the weather data
 
-        responses = openmeteo.weather_api(url, params=params)
+        responses = openmeteo.weather_api(
+            url, params=params
+        )  # api call and response is collected
 
+        # creating a df from the response and then converting  it to a dictionary
         response = responses[0]
 
         hourly = response.Hourly()
@@ -93,15 +113,20 @@ def extract_weather() -> bool:
         hourly_dataframe_dict = hourly_dataframe.to_dict("records")
 
         duplicate_count = 0
+
+        # writing the data to the database
         for data in hourly_dataframe_dict:
             try:
+                # creating '_id' key for the database
                 data["_id"] = f"{(int(data['date'].timestamp()))}"
                 weather_collection.insert_one(data)
 
             except errors.DuplicateKeyError:
-                duplicate_count += 1
+                duplicate_count += 1  # counting the number of duplicates
         if duplicate_count > 0:
-            log.warning(f"Total duplicate data not inserted: {duplicate_count}")
+            log.warning(
+                f"Total duplicate data not inserted: {duplicate_count}"
+            )  # log if any duplicates in the incoming data.
 
     except Exception as e:
         log.error(f"Error: {e}")
@@ -111,9 +136,19 @@ def extract_weather() -> bool:
     return result
 
 
+# defining the function to extract aqi
 @op(out=Out(bool))
 def extract_aqi() -> bool:
+    """
+    This function fetches the aqi data from the open-meteo api and dumps it to a mongodb database
+    returns a boolean value to indicate the success.
+    """
+
     result = True
+    # code for api call and retrival of the data is provided by the openmeteo https://open-meteo.com/en/docs/air-quality-api
+    # minor changes are made to suite our project needs
+
+    # api call parameters defined
     url = "https://air-quality-api.open-meteo.com/v1/air-quality"
     params = {
         "latitude": 53.3331,
@@ -138,17 +173,20 @@ def extract_aqi() -> bool:
         "timezone": "Europe/London",
     }
     try:
+        # establish the database connection
         client = MongoClient(mongo_connect)
         projectdb_mongo = client["projectdb_mongo"]
 
-        aqi_collection = projectdb_mongo["aqi_collection"]
+        aqi_collection = projectdb_mongo[
+            "aqi_collection"
+        ]  # create a collection to store the aqi data
 
         responses = openmeteo.weather_api(url, params=params)
 
-        # Process first location. Add a for-loop for multiple locations or weather models
         response = responses[0]
 
         # Process hourly data. The order of variables needs to be the same as requested.
+        # creating a df from the response and then converting  it to a dictionary
         hourly = response.Hourly()
         hourly_pm10 = hourly.Variables(0).ValuesAsNumpy()
         hourly_pm2_5 = hourly.Variables(1).ValuesAsNumpy()
@@ -192,15 +230,20 @@ def extract_aqi() -> bool:
         hourly_dataframe_dict = hourly_dataframe.to_dict("records")
 
         duplicate_count = 0
+
+        # writing the data to the database
         for data in hourly_dataframe_dict:
             try:
+                # creating '_id' key for the database
                 data["_id"] = f"{int(data['date'].timestamp())}"
                 aqi_collection.insert_one(data)
 
             except errors.DuplicateKeyError:
-                duplicate_count += 1
+                duplicate_count += 1  # counting for duplicates
         if duplicate_count > 0:
-            log.warning(f"Total duplicate data not inserted: {duplicate_count}")
+            log.warning(
+                f"Total duplicate data not inserted: {duplicate_count}"
+            )  # log if duplicates are found
 
     except Exception as e:
         log.error(f"Error: {e}")
@@ -212,12 +255,20 @@ def extract_aqi() -> bool:
 
 @op(out=Out(bool))
 def extract_footfall() -> bool:
+    """
+    This function fetches the footfall data from the footfall.csv file and dumps it to a mongodb database
+    returns a boolean value to indicate the success.
+    """
+
     result = True
     try:
         client = MongoClient(mongo_connect)
         projectdb_mongo = client["projectdb_mongo"]
-        footfall_collection = projectdb_mongo["footfall_collection"]
+        footfall_collection = projectdb_mongo[
+            "footfall_collection"
+        ]  # create a collection to store the footfall data
 
+        # loading csv file to dataframe
         footfall_csv = "footfall.csv"
         try:
             footfall_df = pd.read_csv(footfall_csv)
@@ -226,8 +277,10 @@ def extract_footfall() -> bool:
             log.error(f"Failed to read data from CSV file. \n {e}")
 
         duplicate_count = 0
+        # writing the data to the database
         for data in footfall_dict:
             try:
+                # creating '_id' key for the database
                 data["_id"] = str(
                     int(
                         (
@@ -238,9 +291,11 @@ def extract_footfall() -> bool:
                 footfall_collection.insert_one(data)
 
             except errors.DuplicateKeyError:
-                duplicate_count += 1
+                duplicate_count += 1  # count for duplicates
         if duplicate_count > 0:
-            log.warning(f"Total duplicate data not inserted: {duplicate_count}")
+            log.warning(
+                f"Total duplicate data not inserted: {duplicate_count}"
+            )  # log if duplicates are found
 
     except Exception as e:
         log.error(f"Error: {e}")
@@ -250,6 +305,7 @@ def extract_footfall() -> bool:
     return result
 
 
+# WeatherDataFrame used to validate the weather data retreived from mongodb
 WeatherDataFrame = create_dagster_pandas_dataframe_type(
     name="WeatherDataFrame",
     columns=[
@@ -274,6 +330,8 @@ WeatherDataFrame = create_dagster_pandas_dataframe_type(
         PandasColumn.float_column(name="sunshine_duration", non_nullable=True),
     ],
 )
+
+# AqiDataFrame used to validate the aqi data retreived from mongodb
 AqiDataFrame = create_dagster_pandas_dataframe_type(
     name="AqiDataFr",
     columns=[
@@ -304,14 +362,21 @@ AqiDataFrame = create_dagster_pandas_dataframe_type(
     ],
 )
 
+## non validation is implemented for the footfall data
+
 
 @op(ins={"start": In(bool)}, out=Out(WeatherDataFrame))
 def transform_weather(start) -> pd.DataFrame:
+    """
+    function retrieves the weather data from mongo db database and ensure data is cleaned if not cleans the data.
+    returns a Dataframe
+    """
     client = MongoClient(mongo_connect)
     projectdb_mongo = client["projectdb_mongo"]
 
     weather_collection = projectdb_mongo["weather_collection"]
 
+    # Retrieve the data from the collection flattens it and creates a dataframe.
     weather_df = pd.DataFrame(list(weather_collection.find({})))
 
     weather_df["date"] = pd.to_datetime(weather_df["date"])
@@ -319,40 +384,56 @@ def transform_weather(start) -> pd.DataFrame:
 
     weather_df = weather_df[
         (weather_df["date"] >= "2023-01-01") & (weather_df["date"] < "2024-01-01")
-    ]
+    ]  # ensuring the data for the year 2023 is only retained
+
     return weather_df
 
 
 @op(ins={"start": In(bool)}, out=Out(AqiDataFrame))
 def transform_aqi(start) -> pd.DataFrame:
+    """
+    function retrieves the aqi data from mongo db database and ensure data is cleaned if not cleans the data.
+    returns a Dataframe
+    """
     client = MongoClient(mongo_connect)
     projectdb_mongo = client["projectdb_mongo"]
 
     aqi_collection = projectdb_mongo["aqi_collection"]
 
+    # Retrieve the data from the collection flattens it and creates a dataframe.
     aqi_df = pd.DataFrame(list(aqi_collection.find({})))
 
     aqi_df["date"] = pd.to_datetime(aqi_df["date"])
     aqi_df["_id"] = aqi_df["_id"].astype(int)
+
     # Filtering data from 2023-01-01 to 2023-12-31
     aqi_df = aqi_df[(aqi_df["date"] >= "2023-01-01") & (aqi_df["date"] < "2024-01-01")]
 
     return aqi_df
 
 
-@op()
+@op(ins={"start": In(bool)})
 def transform_footfall(start) -> pd.DataFrame:
+    """
+    function retrieves the aqi data from mongo db database and ensure data is cleaned if not cleans the data.
+    returns a Dataframe
+    """
+
     client = MongoClient(mongo_connect)
     projectdb_mongo = client["projectdb_mongo"]
     aqi_collection = projectdb_mongo["footfall_collection"]
+
+    # Retrieve the data from the collection flattens it and creates a dataframe.
     footfall_df = pd.DataFrame(list(aqi_collection.find({})))
     footfall_df["_id"] = footfall_df["_id"].astype(int)
+
     # Cleaning data removing all variables with more than 80% Null Values
     threshold = 0.8
     missing_percentage = footfall_df.isna().sum() / len(footfall_df)
     columns_to_drop = missing_percentage[missing_percentage > threshold].index
     footfall_df = footfall_df.drop(columns=columns_to_drop)
     footfall_df = footfall_df.fillna(0)
+
     return footfall_df
 
 
@@ -365,7 +446,14 @@ def transform_footfall(start) -> pd.DataFrame:
     out=Out(pd.DataFrame),
 )
 def join_data(weather_df, aqi_df, footfall_df) -> pd.DataFrame:
-    aqi_df = aqi_df.drop("date", axis=1)
+    """
+    function retrieves all the 3 data from mongo db database and joins it based on the common key.
+    retains only the relevent columns and drops the rest.
+    returns a Dataframe
+    """
+
+    aqi_df = aqi_df.drop("date", axis=1)  # drops the duplicate dates column
+    # retains only the relevant places under the scope of this project
     footfall_df = footfall_df[
         [
             "_id",
@@ -391,6 +479,8 @@ def join_data(weather_df, aqi_df, footfall_df) -> pd.DataFrame:
             "Richmond st south/Portabello Harbour outbound",
         ]
     ]
+
+    # merges the 3 dataframe to a single dataframe and returns it
     dfs = [weather_df, aqi_df, footfall_df]
     merged_df = reduce(
         lambda left, right: pd.merge(left, right, on="_id", how="inner"), dfs
@@ -399,10 +489,21 @@ def join_data(weather_df, aqi_df, footfall_df) -> pd.DataFrame:
     return merged_df
 
 
-@op()
+@op(
+    ins={
+        "merged_df": In(pd.DataFrame),
+    },
+    out=Out(bool),
+)
 def load_data(merged_df) -> bool:
-    postgres_engine = create_engine(postgres_connect)
+    """
+    loads the final dataframe to a postgresql database
+    returns a boolean value to indicate the success.
+    """
+    result = False
+    postgres_engine = create_engine(postgres_connect)  # postgresql database connection
 
+    # inserts the data to the postgresql database
     with postgres_engine.connect() as conn:
         row_count = merged_df.to_sql(
             name="weather_aqi_footfall",
@@ -412,9 +513,12 @@ def load_data(merged_df) -> bool:
             if_exists="replace",
         )
         log.info("{} records loaded".format(row_count))
-        return True
+        result = True
+
+    return result
 
 
+# job for the etl process
 @job()
 def etl():
     load_data(
