@@ -11,27 +11,35 @@ Team members
 ### Getting Started....
 
 Requirments :
-Up and running docker desktop in your local PC: [Docker](https://www.docker.com/products/docker-desktop/)
+Up and running docker engine in your local PC: [Docker](https://www.docker.com/products/docker-desktop/)
 
-Extract the compressed folder **DAP Project_AA.zip**
+start with cloning the repo
 
-Rename ```.env.sample```  to ```.env``` to set your enviornment variables
+``` git clone https://github.com/ankithbjoseph/TeamAA_DAP_JAN2024.git ```
 
-initiate Command Prompt and navigate to  extracted folder DAP Project_AA on your system
+OR
 
-execute  command :    
+Extract the compressed contents to a folder 
+
+Rename ```.env.sample```  to ```.env``` to set your enviornment variables.
+
+initiate Command Prompt and navigate to  extracted folder  on your system
+
+``` cd .\TeamAA_DAP_JAN2024\ ```
+
+Set up the docker containers, execute  command :    
 
 ```docker compose up -d```
 
-After building all the containers terminal will be detached and docker containers will be running
+After building all the containers terminal will be detached and docker containers will be up and running
 
 Navigate to container tab in docker 
 
 View **dagster etl** at  [http://localhost:3000/](http://localhost:3000/)
 
-Open launchpad and run the job (ETL job will starts executing)
+Open launchpad and run the job (ETL job will start executing)
 
-once etl run gets completed 
+once etl run gets completed successfully 
 
 view the **dashboard** at [http://localhost:5006/dashboard](http://localhost:5006/dashboard) 
 
