@@ -11,6 +11,10 @@ import folium
 from folium.plugins import MarkerCluster
 
 
+# the dashboard layout is build upon the code from https://github.com/sunny2309/multipage_panel_dashboard
+# credits : sunny2309|github
+
+
 # Apply the CSS class to Panel components
 pn.extension()
 
