@@ -65,7 +65,7 @@ In our project we use a method called Knowledge Discovery in Databases (KDD) fir
 
 
 == *Data Selection:*
-The initial stage of our project involves selecting appropriate datasets. This process requires consideration of various factors like data quality and relevance. We use historical pedestrian footfall data which is collected from SmartDublin in CSV format along with historical weather and air quality data, which we gather through APIs from OpenMeteo. This two approach allows us to combine different types of data therby giving us a clear picture of historical trends. This method make sure that we have a rich dataset that captures both the human activity in urban spaces and the environmental conditions they experience.
+The initial stage of our project involves selecting appropriate datasets. This process requires consideration of various factors like data quality and relevance. We use historical pedestrian footfall data which is collected from SmartDublin in CSV format along with historical weather and air quality data, which we gather through APIs from OpenMeteo @Zippenfenig2023 @Hersbach2023 @MunozSabater2019 @Schimanke2021. This two approach allows us to combine different types of data therby giving us a clear picture of historical trends. This method make sure that we have a rich dataset that captures both the human activity in urban spaces and the environmental conditions they experience.
 
 
 == *Storage and Preprocessing/Transformation:*
@@ -148,11 +148,11 @@ After preprocessing we transfer the cleaned and structured data into a PostgreSQ
 
 
 == *Knowledge:*
-The final goal of our process is to extract knowledge that can be used in decision making. We get this by converting complex data sets into clear, easyto understand visualizations. These graphs not only make it easier to spot patterns and insights therby making  informed decisions. These visualizations are explained in the next section "Data Visualization"
+The final goal of our process is to extract knowledge that can be used in decision making. We get this by converting complex data sets into clear, easyto understand visualizations. These graphs not only make it easier to spot patterns and insights therby making  informed decisions. These visualizations are explained in the next section "Data Visualization" 
 
 #figure(
       image("images/graphviz.png"),
-      caption: [KDD Lifecycle],
+      caption: [KDD Lifecycle], 
     )<a>
 
 The way we use the Knowledge Discovery in Databases (KDD) lifecycle is iterative which means we continuously refine our methods of analysis. Each step of this process is carefully detailed in @a. This approach is about more than just processing data infact every step in our process builds upon the previous one.
