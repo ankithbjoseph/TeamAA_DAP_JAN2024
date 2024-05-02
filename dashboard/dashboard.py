@@ -10,10 +10,11 @@ from bokeh.models import LinearAxis, Range1d
 import folium
 from folium.plugins import MarkerCluster
 
+
 # Apply the CSS class to Panel components
 pn.extension()
 
-#connection with PostgreSQL
+# connection with PostgreSQL
 postgres_host = os.getenv("POSTGRES_HOST", "localhost")
 warnings.filterwarnings("ignore", category=UserWarning)
 postgres_connect = f"postgresql://dap:dap@{postgres_host}:5432/projectdb"
@@ -39,7 +40,8 @@ def create_map():
 
     return m
 
-#function for displaying 20 datasets from final table
+
+# function for displaying 20 datasets from final table
 def get_dataset():
     try:
         query_string = """
@@ -63,7 +65,8 @@ def get_dataset():
     except exc.SQLAlchemyError as db_error:
         print("Database error:", db_error)
 
-#function to display corelation b/w variables
+
+# function to display corelation b/w variables
 def create_scatter_plot(column, location, daterange):
     (start_date, end_date) = daterange
 
@@ -114,7 +117,8 @@ def create_scatter_plot(column, location, daterange):
     except exc.SQLAlchemyError as db_error:
         print("Database error:", db_error)
 
-#finction to display the relationship b/w two variables using line plot
+
+# function to display the relationship b/w two variables using line plot
 def create_line_plot(var, loc, daterange, avgby):
     match avgby:
         case "Daily":
@@ -268,7 +272,8 @@ button_2.on_click(lambda event: show_page("page_2"))
 button_3.on_click(lambda event: show_page("page_3"))
 button_4.on_click(lambda event: show_page("page_4"))
 
-#function for each page in dashboard
+
+# function for each page in dashboard
 def createpage_0():
     # Create Panel app
     map_viewer = pn.pane.plot.Folium(create_map(), height=400)
@@ -440,7 +445,7 @@ def createpage_3():
 
 
 def createpage_4():
-    pdf_pane = pn.pane.PDF("conference.pdf", width=1190, height=600)
+    pdf_pane = pn.pane.PDF("TeamAA.pdf", width=1190, height=600)
     return pdf_pane
 
 
@@ -451,9 +456,9 @@ mapping = {
     "page_3": createpage_3(),
     "page_4": createpage_4(),
 }
-#defining main area in dashboard
+# defining main area in dashboard
 main_area = pn.Column(mapping["page_0"], width=1190)
-#defining side bar
+# defining side bar
 sidebar = pn.Column(
     button_0,
     button_2,
