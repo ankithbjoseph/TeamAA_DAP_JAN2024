@@ -1,0 +1,74 @@
+# Exclude version control
+.git
+.gitignore
+.gitattributes
+
+# Exclude Python cache and build artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+dist/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Exclude virtual environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Exclude IDE settings
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Exclude test and coverage
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+
+# Exclude Jupyter notebooks
+.ipynb_checkpoints/
+*.ipynb
+
+# Exclude documentation and research
+README.md
+Research.md
+Research.html
+Research_files/
+report/
+
+# Exclude logs and temporary files
+*.log
+*.tmp
+.cache
+.cache.sqlite
+
+# Exclude output and analysis directories
+output/
+analysis/
+
+# Exclude Docker files
+docker-compose.yaml
+docker-compose.yml
+docker-compose.*.yml
+Dockerfile
+*/Dockerfile
+.dockerignore
+
+# Exclude data files (keep only necessary ones)
+*.csv
+!footfall.csv
+!dashboard/filtered_locations.csv
