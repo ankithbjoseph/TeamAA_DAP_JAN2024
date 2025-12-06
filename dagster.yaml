@@ -3,7 +3,7 @@ storage:
     postgres_db:
       username: dap
       password: dap
-      hostname: postgres_database
+      hostname: postgres
       db_name: postgres
       port: 5432
 

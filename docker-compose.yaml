@@ -16,7 +16,7 @@ services:
       - ./dagster.yaml:/main/dagster.yaml
       - ./workspace.yaml:/main/workspace.yaml
     environment:
-      POSTGRES_HOST: postgres_database
+      POSTGRES_HOST: postgres
       DAGSTER_HOME: /main
     command: dagster-webserver -h 0.0.0.0 -w workspace.yaml
 
@@ -31,7 +31,7 @@ services:
       - ./dagster.yaml:/main/dagster.yaml
       - ./workspace.yaml:/main/workspace.yaml
     environment:
-      POSTGRES_HOST: postgres_database
+      POSTGRES_HOST: postgres
       DAGSTER_HOME: /main
     command: dagster-daemon run
 
@@ -79,7 +79,7 @@ services:
     ports:
       - 8081:8081
     environment:
-      ME_CONFIG_MONGODB_URL: "mongodb://${USER:-dap}:${PASSWORD:-dap}@mongodb_database:27017"
+      ME_CONFIG_MONGODB_URL: "mongodb://${USER:-dap}:${PASSWORD:-dap}@mongodb:27017"
       ME_CONFIG_BASICAUTH_USERNAME: ${USER:-dap}
       ME_CONFIG_BASICAUTH_PASSWORD: ${PASSWORD:-dap}
     depends_on:
@@ -140,7 +140,7 @@ services:
 
 configs:
   pgpass:
-    content: postgres_database:5432:*:${USER:-dap}:${PASSWORD:-dap}
+    content: postgres:5432:*:${USER:-dap}:${PASSWORD:-dap}
   servers.json:
     content: |
       {
@@ -148,7 +148,7 @@ configs:
             "1": {
               "Name": "postgres",
               "Group": "Servers",
-              "Host": "postgres_database",
+              "Host": "postgres",
               "Port": 5432,
               "MaintenanceDB": "postgres",
               "Username": "dap",

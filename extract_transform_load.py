@@ -18,8 +18,8 @@ openmeteo = openmeteo_requests.Client(session=retry_session)
 
 # connectiion strings for the databases
 # base code taken from https://pypi.org/project/openmeteo-requests/ example code
-postgres_connect = "postgresql://dap:dap@postgres_database:5432/projectdb"
-mongo_connect = "mongodb://dap:dap@mongodb_database"
+postgres_connect = "postgresql://dap:dap@postgres:5432/projectdb"
+mongo_connect = "mongodb://dap:dap@mongodb"
 # postgres_connect = "postgresql://dap:dap@127.0.0.1:5432/projectdb"
 # mongo_connect = "mongodb://dap:dap@127.0.0.1"
 
