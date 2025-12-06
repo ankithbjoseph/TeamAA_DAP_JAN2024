@@ -9,14 +9,16 @@ services:
     ports:
       - "3000:3000"
     depends_on:
-      - mongodb
-      - postgres
+      mongodb:
+        condition: service_started
+      postgres:
+        condition: service_healthy
     volumes:
       - ./output:/main/storage
       - ./dagster.yaml:/main/dagster.yaml
       - ./workspace.yaml:/main/workspace.yaml
     environment:
-      POSTGRES_HOST: postgres
+      POSTGRES_HOST: postgres_database
       POSTGRES_USER: ${USER:-dap}
       POSTGRES_PASSWORD: ${PASSWORD:-dap}
       POSTGRES_DB: postgres
@@ -27,14 +29,16 @@ services:
     container_name: dagster_daemon
     build: .
     depends_on:
-      - mongodb
-      - postgres
+      mongodb:
+        condition: service_started
+      postgres:
+        condition: service_healthy
     volumes:
       - ./output:/main/storage
       - ./dagster.yaml:/main/dagster.yaml
       - ./workspace.yaml:/main/workspace.yaml
     environment:
-      POSTGRES_HOST: postgres
+      POSTGRES_HOST: postgres_database
       POSTGRES_USER: ${USER:-dap}
       POSTGRES_PASSWORD: ${PASSWORD:-dap}
       POSTGRES_DB: postgres
@@ -75,6 +79,11 @@ services:
     configs:
       - source: createdb.sql
         target: /docker-entrypoint-initdb.d/createdb.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${USER:-dap} -d postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   ## MONGO EXPRESS
 
@@ -125,7 +134,7 @@ services:
     ports:
       - 8888:8888
     environment:
-      POSTGRES_HOST: postgres
+      POSTGRES_HOST: postgres_database
     container_name: jupyter_notebook
     command: "start-notebook.sh --NotebookApp.token="
 
@@ -141,7 +150,7 @@ services:
     ports:
       - 5006:5006
     environment:
-      POSTGRES_HOST: postgres
+      POSTGRES_HOST: postgres_database
   ## CONFIGS
 
 configs:
