@@ -17,6 +17,9 @@ services:
       - ./workspace.yaml:/main/workspace.yaml
     environment:
       POSTGRES_HOST: postgres
+      POSTGRES_USER: ${USER:-dap}
+      POSTGRES_PASSWORD: ${PASSWORD:-dap}
+      POSTGRES_DB: postgres
       DAGSTER_HOME: /main
     command: dagster-webserver -h 0.0.0.0 -w workspace.yaml
 
@@ -32,6 +35,9 @@ services:
       - ./workspace.yaml:/main/workspace.yaml
     environment:
       POSTGRES_HOST: postgres
+      POSTGRES_USER: ${USER:-dap}
+      POSTGRES_PASSWORD: ${PASSWORD:-dap}
+      POSTGRES_DB: postgres
       DAGSTER_HOME: /main
     command: dagster-daemon run
 
@@ -119,7 +125,7 @@ services:
     ports:
       - 8888:8888
     environment:
-      POSTGRES_HOST: postgres_database
+      POSTGRES_HOST: postgres
     container_name: jupyter_notebook
     command: "start-notebook.sh --NotebookApp.token="
 
@@ -135,7 +141,7 @@ services:
     ports:
       - 5006:5006
     environment:
-      POSTGRES_HOST: postgres_database
+      POSTGRES_HOST: postgres
   ## CONFIGS
 
 configs:

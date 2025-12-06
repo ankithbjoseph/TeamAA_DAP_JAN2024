@@ -4,6 +4,7 @@ from pymongo import MongoClient, errors
 import openmeteo_requests
 import requests_cache
 import pandas as pd
+import os
 from retry_requests import retry
 from sqlalchemy import create_engine
 from functools import reduce
@@ -18,8 +19,20 @@ openmeteo = openmeteo_requests.Client(session=retry_session)
 
 # connectiion strings for the databases
 # base code taken from https://pypi.org/project/openmeteo-requests/ example code
-postgres_connect = "postgresql://dap:dap@postgres:5432/projectdb"
-mongo_connect = "mongodb://dap:dap@mongodb"
+postgres_user = os.getenv("POSTGRES_USER", "dap")
+postgres_password = os.getenv("POSTGRES_PASSWORD", "dap")
+postgres_host = os.getenv("POSTGRES_HOST", "postgres")
+postgres_port = os.getenv("POSTGRES_PORT", "5432")
+postgres_db = os.getenv("POSTGRES_DB_APP", "projectdb")
+
+postgres_connect = f"postgresql://{postgres_user}:{postgres_password}@{postgres_host}:{postgres_port}/{postgres_db}"
+
+mongo_user = os.getenv("MONGO_USER", "dap")
+mongo_password = os.getenv("MONGO_PASSWORD", "dap")
+mongo_host = os.getenv("MONGO_HOST", "mongodb")
+mongo_port = os.getenv("MONGO_PORT", "27017")
+
+mongo_connect = f"mongodb://{mongo_user}:{mongo_password}@{mongo_host}:{mongo_port}"
 # postgres_connect = "postgresql://dap:dap@127.0.0.1:5432/projectdb"
 # mongo_connect = "mongodb://dap:dap@127.0.0.1"
 
