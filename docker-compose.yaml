@@ -147,7 +147,9 @@ services:
       context: .
       dockerfile: ./dashboard/Dockerfile
     volumes:
-      - ./dashboard:/dashboard
+      - type: bind
+        source: ./dashboard
+        target: /dashboard
     ports:
       - 5006:5006
     environment:
