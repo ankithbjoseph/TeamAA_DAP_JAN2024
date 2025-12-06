@@ -1,3 +1,4 @@
+version: "3"
 name: team_aa_dap_2024
 services:
 
