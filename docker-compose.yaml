@@ -13,8 +13,27 @@ services:
       - postgres
     volumes:
       - ./output:/main/storage
+      - ./dagster.yaml:/main/dagster.yaml
+      - ./workspace.yaml:/main/workspace.yaml
     environment:
       POSTGRES_HOST: postgres_database
+      DAGSTER_HOME: /main
+    command: dagster-webserver -h 0.0.0.0 -w workspace.yaml
+
+  dagster_daemon:
+    container_name: dagster_daemon
+    build: .
+    depends_on:
+      - mongodb
+      - postgres
+    volumes:
+      - ./output:/main/storage
+      - ./dagster.yaml:/main/dagster.yaml
+      - ./workspace.yaml:/main/workspace.yaml
+    environment:
+      POSTGRES_HOST: postgres_database
+      DAGSTER_HOME: /main
+    command: dagster-daemon run
 
   ## MONGODB
 
@@ -46,7 +65,7 @@ services:
       POSTGRES_USER: ${USER:-dap}
       POSTGRES_PASSWORD: ${PASSWORD:-dap}
     volumes:
-      - postgres-data:/var/lib/postgresql/data
+      - postgres-data:/var/lib/postgresql
     configs:
       - source: createdb.sql
         target: /docker-entrypoint-initdb.d/createdb.sql
