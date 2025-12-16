@@ -20,8 +20,12 @@ pn.extension()
 
 # connection with PostgreSQL
 postgres_host = os.getenv("POSTGRES_HOST", "localhost")
+postgres_user = os.getenv("POSTGRES_USER", "")
+postgres_password = os.getenv("POSTGRES_PASSWORD", "")
+postgres_port = os.getenv("POSTGRES_PORT", "5432")
+postgres_db = os.getenv("POSTGRES_DB_APP", "projectdb")
 warnings.filterwarnings("ignore", category=UserWarning)
-postgres_connect = f"postgresql://dap:dap@{postgres_host}:5432/projectdb"
+postgres_connect = f"postgresql://{postgres_user}:{postgres_password}@{postgres_host}:{postgres_port}/{postgres_db}"
 
 df = data = pd.read_csv("filtered_locations.csv")
 

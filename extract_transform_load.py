@@ -17,24 +17,30 @@ cache_session = requests_cache.CachedSession(".cache", expire_after=-1)
 retry_session = retry(cache_session, retries=5, backoff_factor=0.2)
 openmeteo = openmeteo_requests.Client(session=retry_session)
 
+
 # connectiion strings for the databases
 # base code taken from https://pypi.org/project/openmeteo-requests/ example code
-postgres_user = os.getenv("POSTGRES_USER", "dap")
-postgres_password = os.getenv("POSTGRES_PASSWORD", "dap")
-postgres_host = os.getenv("POSTGRES_HOST", "postgres")
-postgres_port = os.getenv("POSTGRES_PORT", "5432")
-postgres_db = os.getenv("POSTGRES_DB_APP", "projectdb")
+def _get_env(name: str, default: str | None = None, required: bool = False) -> str:
+    val = os.getenv(name, default)
+    if required and (val is None or val == ""):
+        raise RuntimeError(f"Environment variable {name} is required but not set")
+    return val
+
+
+postgres_user = _get_env("POSTGRES_USER", required=True)
+postgres_password = _get_env("POSTGRES_PASSWORD", required=True)
+postgres_host = _get_env("POSTGRES_HOST", "postgres")
+postgres_port = _get_env("POSTGRES_PORT", "5432")
+postgres_db = _get_env("POSTGRES_DB_APP", "projectdb")
 
 postgres_connect = f"postgresql://{postgres_user}:{postgres_password}@{postgres_host}:{postgres_port}/{postgres_db}"
 
-mongo_user = os.getenv("MONGO_USER", "dap")
-mongo_password = os.getenv("MONGO_PASSWORD", "dap")
-mongo_host = os.getenv("MONGO_HOST", "mongodb")
-mongo_port = os.getenv("MONGO_PORT", "27017")
+mongo_user = _get_env("MONGO_INITDB_ROOT_USERNAME", required=True)
+mongo_password = _get_env("MONGO_INITDB_ROOT_PASSWORD", required=True)
+mongo_host = _get_env("MONGO_HOST", "mongodb")
+mongo_port = _get_env("MONGO_PORT", "27017")
 
 mongo_connect = f"mongodb://{mongo_user}:{mongo_password}@{mongo_host}:{mongo_port}"
-# postgres_connect = "postgresql://dap:dap@127.0.0.1:5432/projectdb"
-# mongo_connect = "mongodb://dap:dap@127.0.0.1"
 
 
 # defining the function to extract weather

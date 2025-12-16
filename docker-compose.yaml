@@ -1,14 +1,16 @@
-version: "3"
 name: team_aa_dap_2024
 services:
 
   ## DAGSTER
 
-  dagster:
+  dashboard:
     container_name: dagster_etl
     build: .
+    env_file:
+      - .env
     ports:
       - "3000:3000"
+      - "5006:5006"
     depends_on:
       mongodb:
         condition: service_started
@@ -16,44 +18,21 @@ services:
         condition: service_healthy
     volumes:
       - ./output:/main/storage
+      - ./dashboard:/main/dashboard
       - ./dagster.yaml:/main/dagster.yaml
       - ./workspace.yaml:/main/workspace.yaml
-    environment:
-      POSTGRES_HOST: postgres_database
-      POSTGRES_USER: ${USER:-dap}
-      POSTGRES_PASSWORD: ${PASSWORD:-dap}
-      POSTGRES_DB: postgres
-      DAGSTER_HOME: /main
-    command: dagster-webserver -h 0.0.0.0 -w workspace.yaml
 
-  dagster_daemon:
-    container_name: dagster_daemon
-    build: .
-    depends_on:
-      mongodb:
-        condition: service_started
-      postgres:
-        condition: service_healthy
-    volumes:
-      - ./output:/main/storage
-      - ./dagster.yaml:/main/dagster.yaml
-      - ./workspace.yaml:/main/workspace.yaml
-    environment:
-      POSTGRES_HOST: postgres_database
-      POSTGRES_USER: ${USER:-dap}
-      POSTGRES_PASSWORD: ${PASSWORD:-dap}
-      POSTGRES_DB: postgres
-      DAGSTER_HOME: /main
-    command: dagster-daemon run
 
   ## MONGODB
 
   mongodb:
     image: "mongo"
     container_name: mongodb_database
+    env_file:
+      - .env
     environment:
-      MONGO_INITDB_ROOT_USERNAME: ${USER:-dap}
-      MONGO_INITDB_ROOT_PASSWORD: ${PASSWORD:-dap}
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
     ports:
       - 27017-27019:27017-27019
     restart: unless-stopped
@@ -71,17 +50,19 @@ services:
     container_name: postgres_database
     ports:
       - "5432:5432"
+    env_file:
+      - .env
     environment:
-      POSTGRES_DB: postgres
-      POSTGRES_USER: ${USER:-dap}
-      POSTGRES_PASSWORD: ${PASSWORD:-dap}
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - postgres-data:/var/lib/postgresql
     configs:
       - source: createdb.sql
         target: /docker-entrypoint-initdb.d/createdb.sql
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${USER:-dap} -d postgres"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -94,10 +75,12 @@ services:
     restart: unless-stopped
     ports:
       - 8081:8081
+    env_file:
+      - .env
     environment:
-      ME_CONFIG_MONGODB_URL: "mongodb://${USER:-dap}:${PASSWORD:-dap}@mongodb:27017"
-      ME_CONFIG_BASICAUTH_USERNAME: ${USER:-dap}
-      ME_CONFIG_BASICAUTH_PASSWORD: ${PASSWORD:-dap}
+      ME_CONFIG_MONGODB_URL: "mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@${MONGO_HOST:-mongodb}:27017"
+      ME_CONFIG_BASICAUTH_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      ME_CONFIG_BASICAUTH_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
     depends_on:
       - mongodb
 
@@ -106,9 +89,11 @@ services:
   pgadmin:
     container_name: pgadmin
     image: dpage/pgadmin4
+    env_file:
+      - .env
     environment:
-      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL:-dap@dap.com}
-      PGADMIN_DEFAULT_PASSWORD: ${PASSWORD:-dap}
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD}
       PGADMIN_CONFIG_SERVER_MODE: 'False'
       PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED: 'False'
     ports:
@@ -134,31 +119,19 @@ services:
       - ./analysis:/main
     ports:
       - 8888:8888
+    env_file:
+      - .env
     environment:
-      POSTGRES_HOST: postgres_database
+      POSTGRES_HOST: ${POSTGRES_HOST}
     container_name: jupyter_notebook
     command: "start-notebook.sh --NotebookApp.token="
 
-  ## DASHBORAD
-
-  dashboard:
-    container_name: dashboard
-    build:
-      context: .
-      dockerfile: ./dashboard/Dockerfile
-    volumes:
-      - type: bind
-        source: ./dashboard
-        target: /dashboard
-    ports:
-      - 5006:5006
-    environment:
-      POSTGRES_HOST: postgres_database
+  
   ## CONFIGS
 
 configs:
   pgpass:
-    content: postgres:5432:*:${USER:-dap}:${PASSWORD:-dap}
+    content: postgres:5432:*:${POSTGRES_USER}:${POSTGRES_PASSWORD}
   servers.json:
     content: |
       {
@@ -166,17 +139,17 @@ configs:
             "1": {
               "Name": "postgres",
               "Group": "Servers",
-              "Host": "postgres",
-              "Port": 5432,
-              "MaintenanceDB": "postgres",
-              "Username": "dap",
+              "Host": "${POSTGRES_HOST}",
+              "Port": ${POSTGRES_PORT},
+              "MaintenanceDB": "${POSTGRES_DB}",
+              "Username": "${POSTGRES_USER}",
               "PassFile": "/pgpass",
               "SSLMode": "prefer"
             }
           }
         }
   createdb.sql:
-    content: CREATE DATABASE projectdb;
+    content: CREATE DATABASE ${POSTGRES_DB_APP};
 
 volumes:
   postgres-data:

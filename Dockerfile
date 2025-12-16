@@ -9,8 +9,9 @@ COPY requirements.txt requirements.txt
 RUN pip install -r requirements.txt
 COPY . .
 
-FROM base as dagster
-CMD ["dagster-webserver", "-h", "0.0.0.0", "-f", "extract_transform_load.py"]
+# Copy entrypoint that starts both webserver and daemon
+COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
-FROM base as dagster_daemon
-CMD ["dagster-daemon", "run"]
+# Default container command: start both Dagster webserver and daemon
+CMD ["/usr/local/bin/docker-entrypoint.sh"]
