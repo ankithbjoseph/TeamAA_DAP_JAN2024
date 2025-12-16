@@ -4,10 +4,10 @@ services:
   ## DAGSTER
 
   dashboard:
-    container_name: dagster_etl
+    container_name: dashboard
     build:
-      context: ./dashboard
-      dockerfile: ./dashboard/Dockerfile
+      context: .
+      dockerfile: Dockerfile
     image: ghcr.io/ankithbjoseph/teamaa-dashboard:latest
     env_file:
       - .env
