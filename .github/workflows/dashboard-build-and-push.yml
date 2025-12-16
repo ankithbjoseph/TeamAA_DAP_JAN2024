@@ -3,8 +3,8 @@ name: Build and Push Dashboard Image
 on:
   push:
     paths:
-      - 'dashboard/**'
-      - '.github/workflows/dashboard-build-and-push.yml'
+      - "dashboard/**"
+      - ".github/workflows/dashboard-build-and-push.yml"
 
 jobs:
   build-and-push:
