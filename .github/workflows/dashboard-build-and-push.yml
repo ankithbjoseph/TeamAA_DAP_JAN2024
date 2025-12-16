@@ -5,6 +5,7 @@ on:
     paths:
       - "dashboard/**"
       - ".github/workflows/dashboard-build-and-push.yml"
+  workflow_dispatch: {}
 
 jobs:
   build-and-push:
