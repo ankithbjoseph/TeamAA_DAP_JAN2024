@@ -5,7 +5,10 @@ services:
 
   dashboard:
     container_name: dagster_etl
-    build: .
+    build:
+      context: ./dashboard
+      dockerfile: ./dashboard/Dockerfile
+    image: ghcr.io/ankithbjoseph/teamaa-dashboard:latest
     env_file:
       - .env
     ports:

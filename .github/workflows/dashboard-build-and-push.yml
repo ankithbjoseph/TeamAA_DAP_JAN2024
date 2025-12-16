@@ -30,12 +30,12 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build and push dashboard image
-        uses: docker/build-push-action@v4
-        with:
-          context: ./dashboard
-          file: ./dashboard/Dockerfile
-          push: true
-          tags: |
-            ghcr.io/${{ github.repository_owner }}/teamaa-dashboard:latest
-            ghcr.io/${{ github.repository_owner }}/teamaa-dashboard:${{ github.sha }}
+      - name: Build dashboard with Docker Compose
+        run: |
+          docker compose -f docker-compose.yaml build --pull --no-cache dashboard
+
+      - name: Push dashboard image to GHCR
+        run: |
+          docker compose -f docker-compose.yaml push dashboard
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
