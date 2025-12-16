@@ -29,8 +29,6 @@ services:
   mongodb:
     image: "mongo"
     container_name: mongodb_database
-    env_file:
-      - .env
     environment:
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME:-root}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD:-example}
@@ -51,8 +49,6 @@ services:
     container_name: postgres_database
     ports:
       - "5432:5432"
-    env_file:
-      - .env
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-postgres}
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
@@ -76,8 +72,6 @@ services:
     restart: unless-stopped
     ports:
       - 8081:8081
-    env_file:
-      - .env
     environment:
       ME_CONFIG_MONGODB_URL: "mongodb://${MONGO_INITDB_ROOT_USERNAME:-root}:${MONGO_INITDB_ROOT_PASSWORD:-example}@${MONGO_HOST:-mongodb}:27017"
       ME_CONFIG_BASICAUTH_USERNAME: ${MONGO_INITDB_ROOT_USERNAME:-root}
@@ -90,8 +84,6 @@ services:
   pgadmin:
     container_name: pgadmin
     image: dpage/pgadmin4
-    env_file:
-      - .env
     environment:
       PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL:-admin@admin.com}
       PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD:-admin}
@@ -120,8 +112,6 @@ services:
       - ./analysis:/main
     ports:
       - 8888:8888
-    env_file:
-      - .env
     environment:
       POSTGRES_HOST: ${POSTGRES_HOST:-postgres}
     container_name: jupyter_notebook
