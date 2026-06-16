@@ -110,15 +110,9 @@ _CARD_STYLE = {
     "margin-bottom": "16px",
 }
 
-_BADGE_CSS = (
-    "font-family:'Fira Code',monospace;font-size:10px;font-weight:700;"
-    "letter-spacing:.1em;text-transform:uppercase;color:#1E40AF;"
-    "background:#E9EEF6;border-radius:4px;padding:3px 9px;"
-    "display:inline-block;margin-bottom:8px;"
-)
 _H2_CSS = (
-    "font-family:'Fira Code',monospace;font-size:20px;font-weight:600;"
-    "color:#1E3A8A;margin:0 0 4px;"
+    "font-family:'Fira Code',monospace;font-size:22px;font-weight:600;"
+    "color:#1E3A8A;margin:0 0 6px;letter-spacing:-0.01em;"
 )
 _LEAD_CSS = (
     "font-family:'Fira Sans',sans-serif;font-size:13px;"
@@ -128,13 +122,16 @@ _CODE_CSS = (
     "background:#E9EEF6;padding:1px 6px;border-radius:4px;"
     "font-family:'Fira Code',monospace;font-size:12px;"
 )
+_SUB_H_CSS = (
+    "font-family:'Fira Sans',sans-serif;font-size:11px;font-weight:700;"
+    "color:#1E40AF;margin:0 0 8px;letter-spacing:0.04em;text-transform:uppercase;"
+)
 
 
-def _page_header(badge: str, title: str, subtitle: str = "") -> pn.pane.HTML:
+def _page_header(title: str, subtitle: str = "") -> pn.pane.HTML:
     sub = f'<p style="{_LEAD_CSS}">{subtitle}</p>' if subtitle else ""
     return pn.pane.HTML(
-        f'<div style="padding:0 0 16px;">'
-        f'  <span style="{_BADGE_CSS}">{badge}</span>'
+        f'<div style="padding:0 0 20px;border-bottom:1px solid #DBEAFE;margin-bottom:8px;">'
         f'  <h2 style="{_H2_CSS}">{title}</h2>'
         f'  {sub}'
         f'</div>',
@@ -197,9 +194,9 @@ def _controls_col(*widgets) -> pn.Column:
             "border":        "1px solid #DBEAFE",
             "border-radius": "8px",
             "box-shadow":    "0 1px 4px rgba(30,64,175,.10)",
-            "padding":       "20px",
-            "flex":          "0 0 270px",
-            "min-width":     "220px",
+            "padding":       "16px 18px",
+            "flex":          "0 0 260px",
+            "min-width":     "200px",
         },
         css_classes=["dap-controls"],
     )
@@ -357,6 +354,10 @@ CUSTOM_CSS = """
   --radius:     8px;
   --shadow:     0 1px 4px rgba(30,64,175,.10);
   --t:          150ms ease-out;
+
+  /* Spacing scale */
+  --sp-1: 4px;  --sp-2: 8px;   --sp-3: 12px;  --sp-4: 16px;
+  --sp-5: 20px; --sp-6: 24px;  --sp-8: 32px;  --sp-10: 40px;
 }
 
 body, .bk-root {
@@ -571,104 +572,114 @@ sidebar = pn.Column(
 
 # ── Pages ─────────────────────────────────────────────────────────────────────
 def createpage_0():
-    map_viewer = pn.pane.plot.Folium(create_map(), height=420, sizing_mode="stretch_width")
+    map_viewer = pn.pane.plot.Folium(create_map(), height=460, sizing_mode="stretch_width")
+
+    _li_css = (
+        "list-style:none;padding:0;margin:0;font-family:'Fira Sans',sans-serif;"
+        "font-size:12px;color:#1E3A8A;line-height:2;"
+    )
+    _code_tag = (
+        "background:#E9EEF6;padding:1px 6px;border-radius:4px;"
+        "font-family:'Fira Code',monospace;font-size:11px;"
+    )
 
     env_html = (
-        '<ul style="list-style:none;padding:0;margin:0;font-family:\'Fira Sans\',sans-serif;'
-        'font-size:13px;color:#1E3A8A;line-height:2.1;">'
+        f'<ul style="{_li_css}">'
         + "".join(
-            f'<li><code style="background:#E9EEF6;padding:1px 6px;border-radius:4px;'
-            f'font-family:\'Fira Code\',monospace;font-size:11px;">{k}</code>'
+            f'<li><code style="{_code_tag}">{k}</code>'
             f'&nbsp;<span style="color:#64748B;">({v})</span></li>'
             for k, v in list(parameters_dict.items())[:10]
         )
         + '</ul>'
     )
-
     aqi_html = (
-        '<ul style="list-style:none;padding:0;margin:0;font-family:\'Fira Sans\',sans-serif;'
-        'font-size:13px;color:#1E3A8A;line-height:2.1;">'
+        f'<ul style="{_li_css}">'
         + "".join(
-            f'<li><code style="background:#E9EEF6;padding:1px 6px;border-radius:4px;'
-            f'font-family:\'Fira Code\',monospace;font-size:11px;">{k}</code>'
+            f'<li><code style="{_code_tag}">{k}</code>'
             + (f'&nbsp;<span style="color:#64748B;">({v})</span>' if v else "")
             + '</li>'
             for k, v in list(parameters_dict.items())[10:]
         )
         + '</ul>'
     )
-
     loc_html = (
-        '<ul style="list-style:none;padding:0;margin:0;font-family:\'Fira Sans\',sans-serif;'
-        'font-size:12px;color:#1E3A8A;line-height:2;">'
+        f'<ul style="{_li_css}">'
         + "".join(f"<li>{loc}</li>" for loc in locations)
         + '</ul>'
     )
 
-    def _info_card(badge: str, title: str, body_html: str) -> pn.Column:
-        return pn.Column(
-            pn.pane.HTML(
-                f'<span style="font-family:\'Fira Code\',monospace;font-size:10px;font-weight:700;'
-                f'letter-spacing:.1em;text-transform:uppercase;color:#1E40AF;background:#E9EEF6;'
-                f'border-radius:4px;padding:3px 9px;display:inline-block;margin-bottom:8px;">{badge}</span>'
-                f'<h3 style="font-family:\'Fira Code\',monospace;font-size:15px;font-weight:600;'
-                f'color:#1E3A8A;margin:0 0 12px;">{title}</h3>'
-                + body_html,
-                sizing_mode="stretch_width",
-            ),
-            styles={
-                "background":    "#FFFFFF",
-                "border":        "1px solid #DBEAFE",
-                "border-radius": "8px",
-                "box-shadow":    "0 1px 4px rgba(30,64,175,.10)",
-                "padding":       "20px 24px",
-                "flex":          "1 1 240px",
-            },
+    _card_base = (
+        "background:#FFFFFF;border:1px solid #DBEAFE;border-radius:8px;"
+        "box-shadow:0 1px 4px rgba(30,64,175,.10);padding:20px 24px;"
+    )
+
+    variables_card = pn.Column(
+        pn.pane.HTML(
+            f'<h3 style="{_SUB_H_CSS}">Weather</h3>'
+            + env_html
+            + '<hr style="border:none;border-top:1px solid #DBEAFE;margin:16px 0;">'
+            + f'<h3 style="{_SUB_H_CSS}">Air Quality</h3>'
+            + aqi_html,
             sizing_mode="stretch_width",
-        )
+        ),
+        styles={
+            "background": "#FFFFFF", "border": "1px solid #DBEAFE",
+            "border-radius": "8px", "box-shadow": "0 1px 4px rgba(30,64,175,.10)",
+            "padding": "20px 24px", "flex": "1 1 320px",
+        },
+        sizing_mode="stretch_width",
+    )
+
+    locations_card = pn.Column(
+        pn.pane.HTML(
+            f'<h3 style="{_SUB_H_CSS}">Counter Locations</h3>' + loc_html,
+            sizing_mode="stretch_width",
+        ),
+        styles={
+            "background": "#FFFFFF", "border": "1px solid #DBEAFE",
+            "border-radius": "8px", "box-shadow": "0 1px 4px rgba(30,64,175,.10)",
+            "padding": "20px 24px", "flex": "0 0 260px",
+        },
+        sizing_mode="stretch_width",
+    )
 
     return pn.Column(
         pn.pane.HTML(
-            '<div style="padding:0 0 20px;">'
-            '<span style="font-family:\'Fira Code\',monospace;font-size:10px;font-weight:700;'
-            'letter-spacing:.12em;text-transform:uppercase;color:#1E40AF;background:#E9EEF6;'
-            'border-radius:4px;padding:3px 9px;display:inline-block;margin-bottom:10px;">'
-            'Dublin · 2023</span>'
+            '<div style="padding:0 0 24px;">'
             '<h2 style="font-family:\'Fira Code\',monospace;font-size:22px;font-weight:600;'
-            'color:#1E3A8A;margin:0 0 8px;">'
+            'color:#1E3A8A;margin:0 0 8px;letter-spacing:-0.01em;">'
             'Environmental Impact on Pedestrian Footfall</h2>'
             '<p style="font-family:\'Fira Sans\',sans-serif;font-size:14px;color:#64748B;'
             'margin:0;line-height:1.6;max-width:640px;">'
-            'Explores the relationship between weather, air quality, and pedestrian traffic '
-            'across 20 monitoring locations in Dublin city centre throughout 2023.</p>'
+            'Weather, air quality, and pedestrian traffic across 20 monitoring locations '
+            'in Dublin city centre — full year 2023.</p>'
             '</div>',
             sizing_mode="stretch_width",
         ),
-        pn.Row(
-            _info_card("Weather", "Environmental Variables", env_html),
-            _info_card("Air Quality", "AQI Variables", aqi_html),
-            _info_card("Footfall", "Counter Locations", loc_html),
-            sizing_mode="stretch_width",
-            styles={"display": "flex", "gap": "16px", "flex-wrap": "wrap",
-                    "margin-bottom": "16px"},
-        ),
         pn.Column(
             pn.pane.HTML(
-                '<h3 style="font-family:\'Fira Code\',monospace;font-size:15px;font-weight:600;'
-                'color:#1E3A8A;margin:0 0 12px;">Counter Location Map</h3>',
+                f'<h3 style="{_SUB_H_CSS}">Counter Location Map</h3>',
             ),
             map_viewer,
             styles={
-                "background":    "#FFFFFF",
-                "border":        "1px solid #DBEAFE",
-                "border-radius": "8px",
-                "box-shadow":    "0 1px 4px rgba(30,64,175,.10)",
-                "padding":       "20px 24px",
+                "background": "#FFFFFF", "border": "1px solid #DBEAFE",
+                "border-radius": "8px", "box-shadow": "0 1px 4px rgba(30,64,175,.10)",
+                "padding": "20px 24px", "margin-bottom": "20px",
             },
             sizing_mode="stretch_width",
         ),
+        pn.FlexBox(
+            variables_card,
+            locations_card,
+            flex_direction="row",
+            flex_wrap="wrap",
+            justify_content="flex-start",
+            align_items="flex-start",
+            sizing_mode="stretch_width",
+            styles={"gap": "20px"},
+        ),
         sizing_mode="stretch_width",
-        styles={"padding": "20px"},
+        styles={"padding": "24px 32px"},
     )
 
 
@@ -696,21 +707,21 @@ def createpage_1():
 
     return pn.Column(
         _page_header(
-            "Scatter Analysis", "Relationship Between Variables",
+            "Relationship Between Variables",
             "Explore correlations between environmental / AQI parameters and pedestrian footfall.",
         ),
         pn.FlexBox(
-            _chart_col(pn.Column(update_scatter, sizing_mode="stretch_width")),
+            _chart_col(pn.Column(update_scatter, sizing_mode="stretch_both")),
             _controls_col(parameter_column, location_column, date_range_slider),
             flex_direction="row",
             flex_wrap="wrap",
             justify_content="flex-start",
             align_items="flex-start",
-            sizing_mode="stretch_width",
-            styles={"gap": "16px"},
+            sizing_mode="stretch_both",
+            styles={"gap": "20px"},
         ),
-        sizing_mode="stretch_width",
-        styles={"padding": "20px"},
+        sizing_mode="stretch_both",
+        styles={"padding": "24px 32px"},
     )
 
 
@@ -718,7 +729,7 @@ def createpage_2():
     df = get_dataset()
     return pn.Column(
         _page_header(
-            "Preview · 20 rows", "Dataset Explorer",
+            "Dataset",
             'First 20 rows of the merged '
             f'<code style="{_CODE_CSS}">weather_aqi_footfall</code> table.',
         ),
@@ -728,7 +739,7 @@ def createpage_2():
             sizing_mode="stretch_width",
         ),
         sizing_mode="stretch_width",
-        styles={"padding": "20px"},
+        styles={"padding": "24px 32px"},
     )
 
 
@@ -763,40 +774,47 @@ def createpage_3():
 
     return pn.Column(
         _page_header(
-            "Time Series", "Variable Distribution Over Time",
+            "Variable Distribution Over Time",
             "Compare daily / weekly / monthly averages of a weather or AQI variable "
             "against pedestrian counts at a chosen location.",
         ),
         pn.FlexBox(
-            _chart_col(pn.Column(update_line, sizing_mode="stretch_width")),
+            _chart_col(pn.Column(update_line, sizing_mode="stretch_both")),
             _controls_col(
                 parameter_column,
                 location_column,
-                date_range_slider,
+                pn.layout.Divider(
+                    margin=(8, 0, 4, 0),
+                    stylesheets=["hr { border-color: #DBEAFE !important; }"],
+                ),
                 pn.pane.HTML(
-                    '<p style="font-family:\'Fira Sans\',sans-serif;font-size:12px;'
-                    'font-weight:600;color:#1E3A8A;margin:14px 0 4px;">Average by</p>'
+                    f'<p style="{_SUB_H_CSS}margin-top:0;">Aggregate by</p>'
                 ),
                 toggle_group,
+                pn.layout.Divider(
+                    margin=(8, 0, 4, 0),
+                    stylesheets=["hr { border-color: #DBEAFE !important; }"],
+                ),
+                date_range_slider,
             ),
             flex_direction="row",
             flex_wrap="wrap",
             justify_content="flex-start",
             align_items="flex-start",
-            sizing_mode="stretch_width",
-            styles={"gap": "16px"},
+            sizing_mode="stretch_both",
+            styles={"gap": "20px"},
         ),
-        sizing_mode="stretch_width",
-        styles={"padding": "20px"},
+        sizing_mode="stretch_both",
+        styles={"padding": "24px 32px"},
     )
 
 
 def createpage_4():
     return pn.Column(
-        _page_header("PDF", "Project Report"),
-        pn.pane.PDF("TeamAA.pdf", sizing_mode="stretch_width", height=700),
+        _page_header("Project Report"),
+        pn.pane.PDF("TeamAA.pdf", sizing_mode="stretch_width", height=780),
         sizing_mode="stretch_width",
-        styles={"padding": "20px"},
+        styles={"padding": "24px 32px"},
     )
 
 
