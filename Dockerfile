@@ -9,9 +9,14 @@ COPY requirements.txt requirements.txt
 RUN pip install -r requirements.txt
 COPY . .
 
-# Copy entrypoint that starts both webserver and daemon
 COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
-# Default container command: start both Dagster webserver and daemon
+# Run as non-root for security
+RUN useradd -m appuser && chown -R appuser /main /opt/venv
+USER appuser
+
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+  CMD curl -f http://localhost:3000/health || exit 1
+
 CMD ["/usr/local/bin/docker-entrypoint.sh"]

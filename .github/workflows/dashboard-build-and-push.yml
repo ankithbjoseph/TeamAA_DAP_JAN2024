@@ -4,11 +4,34 @@ on:
   push:
     paths:
       - "dashboard/**"
+      - "extract_transform_load.py"
+      - "tests/**"
       - ".github/workflows/dashboard-build-and-push.yml"
   workflow_dispatch: {}
 
 jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install test dependencies
+        run: pip install ruff pytest pytest-mock pandas sqlalchemy pymongo dagster dagster-pandas
+
+      - name: Lint
+        run: ruff check .
+
+      - name: Run tests
+        run: pytest tests/ -v
+
   build-and-push:
+    needs: test
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -35,8 +58,50 @@ jobs:
         run: |
           docker compose -f docker-compose.yaml build --pull --no-cache dashboard
 
-      - name: Push dashboard image to GHCR
-        run: |
-          docker compose -f docker-compose.yaml push dashboard
+      - name: Push latest tag to GHCR
+        run: docker compose -f docker-compose.yaml push dashboard
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Push SHA-tagged image to GHCR
+        run: |
+          docker tag ghcr.io/ankithbjoseph/teamaa-dashboard:latest \
+                     ghcr.io/ankithbjoseph/teamaa-dashboard:${{ github.sha }}
+          docker push ghcr.io/ankithbjoseph/teamaa-dashboard:${{ github.sha }}
+
+  build-and-push-panel:
+    needs: test
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build panel-only dashboard image
+        run: |
+          docker build --pull --no-cache \
+            -f dashboard/Dockerfile \
+            -t ghcr.io/ankithbjoseph/teamaa-dashboard-panel:latest \
+            -t ghcr.io/ankithbjoseph/teamaa-dashboard-panel:${{ github.sha }} \
+            dashboard/
+
+      - name: Push panel-only image to GHCR
+        run: |
+          docker push ghcr.io/ankithbjoseph/teamaa-dashboard-panel:latest
+          docker push ghcr.io/ankithbjoseph/teamaa-dashboard-panel:${{ github.sha }}

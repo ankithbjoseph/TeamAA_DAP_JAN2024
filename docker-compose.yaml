@@ -27,16 +27,16 @@ services:
   ## MONGODB
 
   mongodb:
-    image: "mongo"
+    image: "mongo:7.0"
     container_name: mongodb_database
     environment:
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME:-root}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD:-example}
     ports:
-      - 27017-27019:27017-27019
+      - "127.0.0.1:27017:27017"
     restart: unless-stopped
     healthcheck:
-      test: echo 'db.runCommand("ping").ok'
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
       interval: 10s
       timeout: 10s
       retries: 5
@@ -45,10 +45,10 @@ services:
   ## POSTGRES
 
   postgres:
-    image: "postgres"
+    image: "postgres:16-alpine"
     container_name: postgres_database
     ports:
-      - "5432:5432"
+      - "127.0.0.1:5432:5432"
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-postgres}
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
@@ -71,7 +71,7 @@ services:
     container_name: mongo-express
     restart: unless-stopped
     ports:
-      - 8081:8081
+      - "127.0.0.1:8081:8081"
     environment:
       ME_CONFIG_MONGODB_URL: "mongodb://${MONGO_INITDB_ROOT_USERNAME:-root}:${MONGO_INITDB_ROOT_PASSWORD:-example}@${MONGO_HOST:-mongodb}:27017"
       ME_CONFIG_BASICAUTH_USERNAME: ${MONGO_INITDB_ROOT_USERNAME:-root}
@@ -90,7 +90,7 @@ services:
       PGADMIN_CONFIG_SERVER_MODE: 'False'
       PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED: 'False'
     ports:
-      - "5050:80"
+      - "127.0.0.1:5050:80"
     entrypoint: /bin/sh -c "chmod 600 /pgpass; /entrypoint.sh;"
     user: root
     configs:
@@ -111,7 +111,7 @@ services:
     volumes:
       - ./analysis:/main
     ports:
-      - 8888:8888
+      - "127.0.0.1:8888:8888"
     environment:
       POSTGRES_HOST: ${POSTGRES_HOST:-postgres}
     container_name: jupyter_notebook

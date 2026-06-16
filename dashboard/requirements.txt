@@ -1,0 +1,12 @@
+bokeh==3.8.1
+folium==0.20.0
+pandas==2.3.3
+panel==1.8.4
+psycopg2-binary==2.9.11
+SQLAlchemy==2.0.44
+numpy==2.3.5
+param==2.3.1
+pyarrow==22.0.0
+pyviz_comms==3.0.6
+tornado==6.5.2
+xyzservices==2025.11.0
