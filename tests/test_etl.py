@@ -4,9 +4,8 @@ Unit tests for extract_transform_load.py.
 All tests operate on in-memory DataFrames or mock objects — no live
 database or network connection is required.
 """
-import pytest
 import pandas as pd
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 from pymongo import errors
 
 from extract_transform_load import (
