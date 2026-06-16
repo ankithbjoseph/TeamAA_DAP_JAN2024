@@ -147,7 +147,7 @@ def _style_figure(p):
     p.background_fill_color = C_BG
     p.border_fill_color     = C_PAGE_BG
     p.outline_line_color    = C_BORDER
-    p.sizing_mode           = "stretch_width"
+    p.sizing_mode           = "stretch_both"
     for ax in list(p.xaxis) + list(p.yaxis):
         ax.axis_line_color        = C_BORDER
         ax.major_tick_line_color  = C_BORDER
@@ -185,7 +185,7 @@ def _chart_col(*items) -> pn.Column:
             "min-width":     "0",
             "overflow":      "hidden",
         },
-        sizing_mode="stretch_width",
+        sizing_mode="stretch_both",
     )
 
 
@@ -249,11 +249,12 @@ def create_scatter_plot(column: str, location: str, daterange):
         unit  = parameters_dict[column]
         label = f"{column} ({unit})" if unit else column
         p = figure(
-            title=f"Relationship between {column} and footfall at {location}",
+            title=f"{column}  ↔  Pedestrian traffic · {location}",
             x_axis_label=label,
             y_axis_label="Pedestrian Count",
             tools="crosshair,pan,wheel_zoom,zoom_in,zoom_out,reset,save",
-            height=500,
+            min_height=420,
+            sizing_mode="stretch_both",
         )
         _style_figure(p)
         p.add_tools(HoverTool(tooltips=[
@@ -302,9 +303,10 @@ def create_line_plot(var: str, loc: str, daterange, avgby: str):
 
         p = figure(
             x_axis_type="datetime",
-            title=f"Distribution of {var} and footfall at {loc}",
+            title=f"{var}  &  footfall at {loc}  ·  {avgby} average",
             tools="crosshair,pan,wheel_zoom,zoom_in,zoom_out,reset,save",
-            height=500,
+            min_height=420,
+            sizing_mode="stretch_both",
         )
         _style_figure(p)
         p.xaxis.axis_label = "Date"

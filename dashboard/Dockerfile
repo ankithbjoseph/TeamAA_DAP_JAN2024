@@ -11,6 +11,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY dashboard.py dashboard.py
 COPY filtered_locations.csv filtered_locations.csv
+COPY TeamAA.pdf TeamAA.pdf
 
 RUN useradd -m appuser && chown -R appuser /app /opt/venv
 USER appuser
