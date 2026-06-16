@@ -144,7 +144,7 @@ def _style_figure(p):
     p.background_fill_color = C_BG
     p.border_fill_color     = C_PAGE_BG
     p.outline_line_color    = C_BORDER
-    p.sizing_mode           = "stretch_both"
+    p.sizing_mode           = "stretch_width"
     for ax in list(p.xaxis) + list(p.yaxis):
         ax.axis_line_color        = C_BORDER
         ax.major_tick_line_color  = C_BORDER
@@ -182,7 +182,7 @@ def _chart_col(*items) -> pn.Column:
             "min-width":     "0",
             "overflow":      "hidden",
         },
-        sizing_mode="stretch_both",
+        sizing_mode="stretch_width",
     )
 
 
@@ -250,8 +250,7 @@ def create_scatter_plot(column: str, location: str, daterange):
             x_axis_label=label,
             y_axis_label="Pedestrian Count",
             tools="crosshair,pan,wheel_zoom,zoom_in,zoom_out,reset,save",
-            min_height=420,
-            sizing_mode="stretch_both",
+            height=420,
         )
         _style_figure(p)
         p.add_tools(HoverTool(tooltips=[
@@ -302,8 +301,7 @@ def create_line_plot(var: str, loc: str, daterange, avgby: str):
             x_axis_type="datetime",
             title=f"{var}  &  footfall at {loc}  ·  {avgby} average",
             tools="crosshair,pan,wheel_zoom,zoom_in,zoom_out,reset,save",
-            min_height=420,
-            sizing_mode="stretch_both",
+            height=420,
         )
         _style_figure(p)
         p.xaxis.axis_label = "Date"
@@ -448,8 +446,10 @@ body, .bk-root {
 .dap-controls .bk-btn-group {
   display: flex !important;
   flex-direction: row !important;
-  gap: 6px !important;
-  flex-wrap: wrap !important;
+  gap: 4px !important;
+  flex-wrap: nowrap !important;
+  align-items: stretch !important;
+  width: 100% !important;
 }
 .dap-controls .bk-btn-group .bk-btn {
   border: 1px solid var(--c-border) !important;
@@ -459,9 +459,15 @@ body, .bk-root {
   font-family: 'Fira Sans', sans-serif !important;
   font-size: 12px !important;
   font-weight: 500 !important;
-  padding: 6px 14px !important;
+  padding: 0 8px !important;
+  min-height: 36px !important;
+  flex: 1 1 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
   cursor: pointer !important;
   transition: background var(--t), color var(--t), border-color var(--t) !important;
+  white-space: nowrap !important;
 }
 .dap-controls .bk-btn-group .bk-btn:hover,
 .dap-controls .bk-btn-group .bk-btn.bk-active {
@@ -509,21 +515,55 @@ body, .bk-root {
 
 /* ── Responsive ──────────────────────────────────────────────── */
 @media (max-width: 768px) {
+  /* Controls stack full-width below chart */
   .dap-controls {
     flex: 1 1 100% !important;
     max-width: 100% !important;
     min-width: unset !important;
   }
+
+  /* Reduce page padding on mobile */
+  .dap-page {
+    padding: 16px !important;
+  }
+
+  /* Prevent iOS input zoom (needs 16px) */
+  .bk-input, select.bk-input {
+    font-size: 16px !important;
+    min-height: 44px !important;
+  }
+
+  /* Larger touch targets for toggle buttons */
+  .dap-controls .bk-btn-group .bk-btn {
+    min-height: 44px !important;
+    font-size: 13px !important;
+  }
+
+  /* Larger nav buttons */
+  .mdc-drawer .bk-btn-group .bk-btn {
+    font-size: 13px !important;
+    min-height: 44px !important;
+    padding: 12px 14px !important;
+  }
+
+  /* Shrink top bar title */
   .mdc-top-app-bar__title {
     font-size: 12px !important;
     letter-spacing: 0 !important;
   }
-  .mdc-drawer .bk-btn-group .bk-btn {
-    font-size: 13px !important;
+
+  /* Reduce intro card gap on mobile */
+  .dap-intro-cards {
+    gap: 12px !important;
   }
 }
 @media (max-width: 480px) {
   .mdc-top-app-bar__title { display: none !important; }
+
+  /* Even tighter padding on small phones */
+  .dap-page {
+    padding: 12px !important;
+  }
 }
 """
 
@@ -669,6 +709,7 @@ def createpage_0():
             sizing_mode="stretch_width",
         ),
         sizing_mode="stretch_width",
+        css_classes=["dap-page"],
         styles={"padding": "24px 32px"},
     )
 
@@ -701,16 +742,17 @@ def createpage_1():
             "Explore correlations between environmental / AQI parameters and pedestrian footfall.",
         ),
         pn.FlexBox(
-            _chart_col(pn.Column(update_scatter, sizing_mode="stretch_both")),
+            _chart_col(pn.Column(update_scatter, sizing_mode="stretch_width")),
             _controls_col(parameter_column, location_column, date_range_slider),
             flex_direction="row",
             flex_wrap="wrap",
             justify_content="flex-start",
             align_items="flex-start",
-            sizing_mode="stretch_both",
+            sizing_mode="stretch_width",
             styles={"gap": "20px"},
         ),
-        sizing_mode="stretch_both",
+        sizing_mode="stretch_width",
+        css_classes=["dap-page"],
         styles={"padding": "24px 32px"},
     )
 
@@ -729,6 +771,7 @@ def createpage_2():
             sizing_mode="stretch_width",
         ),
         sizing_mode="stretch_width",
+        css_classes=["dap-page"],
         styles={"padding": "24px 32px"},
     )
 
@@ -769,7 +812,7 @@ def createpage_3():
             "against pedestrian counts at a chosen location.",
         ),
         pn.FlexBox(
-            _chart_col(pn.Column(update_line, sizing_mode="stretch_both")),
+            _chart_col(pn.Column(update_line, sizing_mode="stretch_width")),
             _controls_col(
                 parameter_column,
                 location_column,
@@ -791,10 +834,11 @@ def createpage_3():
             flex_wrap="wrap",
             justify_content="flex-start",
             align_items="flex-start",
-            sizing_mode="stretch_both",
+            sizing_mode="stretch_width",
             styles={"gap": "20px"},
         ),
-        sizing_mode="stretch_both",
+        sizing_mode="stretch_width",
+        css_classes=["dap-page"],
         styles={"padding": "24px 32px"},
     )
 
@@ -804,6 +848,7 @@ def createpage_4():
         _page_header("Project Report"),
         pn.pane.PDF("TeamAA.pdf", sizing_mode="stretch_width", height=780),
         sizing_mode="stretch_width",
+        css_classes=["dap-page"],
         styles={"padding": "24px 32px"},
     )
 
