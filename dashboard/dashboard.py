@@ -249,11 +249,11 @@ def create_scatter_plot(column: str, location: str, daterange):
         unit  = parameters_dict[column]
         label = f"{column} ({unit})" if unit else column
         p = figure(
-            title=f"{column}  ↔  Pedestrian traffic · {location}",
+            title=f"Relationship between {column} and footfall at {location}",
             x_axis_label=label,
             y_axis_label="Pedestrian Count",
             tools="crosshair,pan,wheel_zoom,zoom_in,zoom_out,reset,save",
-            height=440,
+            height=500,
         )
         _style_figure(p)
         p.add_tools(HoverTool(tooltips=[
@@ -302,9 +302,9 @@ def create_line_plot(var: str, loc: str, daterange, avgby: str):
 
         p = figure(
             x_axis_type="datetime",
-            title=f"{var}  &  footfall at {loc}  ·  {avgby} average",
+            title=f"Distribution of {var} and footfall at {loc}",
             tools="crosshair,pan,wheel_zoom,zoom_in,zoom_out,reset,save",
-            height=440,
+            height=500,
         )
         _style_figure(p)
         p.xaxis.axis_label = "Date"
@@ -530,8 +530,8 @@ pn.extension(raw_css=[CUSTOM_CSS])
 # ── Sidebar ───────────────────────────────────────────────────────────────────
 nav = pn.widgets.RadioButtonGroup(
     name="",
-    options=["Introduction", "Relationship Analysis", "Dataset",
-             "Distribution", "Project Report"],
+    options=["Introduction", "Dataset", "Relationship b/w variables",
+             "Distribution of variables", "Project Report"],
     value="Introduction",
     orientation="vertical",
     button_type="default",
@@ -800,11 +800,11 @@ def createpage_4():
 
 # ── App assembly ───────────────────────────────────────────────────────────────
 _page_creators = {
-    "Introduction":          createpage_0,
-    "Relationship Analysis": createpage_1,
-    "Dataset":               createpage_2,
-    "Distribution":          createpage_3,
-    "Project Report":        createpage_4,
+    "Introduction":              createpage_0,
+    "Dataset":                   createpage_2,
+    "Relationship b/w variables": createpage_1,
+    "Distribution of variables": createpage_3,
+    "Project Report":            createpage_4,
 }
 
 mapping    = {k: v() for k, v in _page_creators.items()}
