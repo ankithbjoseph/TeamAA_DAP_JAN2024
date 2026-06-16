@@ -6,7 +6,7 @@ import logging
 from sqlalchemy import create_engine, text, exc
 import pandas.io.sql as sqlio
 from bokeh.plotting import figure
-from bokeh.models import LinearAxis, Range1d, HoverTool
+from bokeh.models import ColumnDataSource, LinearAxis, Range1d, HoverTool
 import datetime as dt
 import folium
 from folium.plugins import MarkerCluster
@@ -253,13 +253,18 @@ def create_scatter_plot(column: str, location: str, daterange):
             height=420,
         )
         _style_figure(p)
+        source = ColumnDataSource({
+            column:               df[column].tolist(),
+            "pedestrian_traffic": df["pedestrian_traffic"].tolist(),
+        })
         p.add_tools(HoverTool(tooltips=[
             (column,             f"@{{{column}}}"),
             ("Pedestrian count", "@pedestrian_traffic"),
         ]))
         p.scatter(
-            x=df[column],
-            y=df["pedestrian_traffic"],
+            x=column,
+            y="pedestrian_traffic",
+            source=source,
             size=5,
             color=C_PRIMARY,
             alpha=0.55,
