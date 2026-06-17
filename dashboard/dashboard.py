@@ -197,6 +197,9 @@ def _controls_col(*widgets) -> pn.Column:
             "padding":       "16px 18px",
             "flex":          "0 0 260px",
             "min-width":     "200px",
+            "display":       "flex",
+            "flex-direction":"column",
+            "gap":           "8px",
         },
         css_classes=["dap-controls"],
     )
@@ -867,7 +870,15 @@ def createpage_1():
         ),
         pn.FlexBox(
             _chart_col(pn.Column(update_scatter, sizing_mode="stretch_width")),
-            _controls_col(parameter_column, location_column, date_range_slider),
+            _controls_col(
+                parameter_column,
+                location_column,
+                pn.layout.Divider(
+                    margin=(4, 0, 0, 0),
+                    stylesheets=["hr { border-color: #DBEAFE !important; }"],
+                ),
+                date_range_slider,
+            ),
             flex_direction="row",
             flex_wrap="wrap",
             justify_content="flex-start",
