@@ -685,6 +685,7 @@ nav = pn.widgets.RadioButtonGroup(
     orientation="vertical",
     button_type="default",
     sizing_mode="stretch_width",
+    margin=0,
     stylesheets=[NAV_CSS],
 )
 
@@ -698,11 +699,12 @@ sidebar = pn.Column(
         'Weather · Air Quality · 2023</div>'
         '</div>',
         sizing_mode="stretch_width",
+        margin=0,
     ),
     nav,
     pn.layout.Divider(
         margin=(12, 14, 4, 14),
-        stylesheets=["hr { border-color: rgba(255,255,255,.15) !important; }"],
+        stylesheets=["hr { border-color: rgba(255,255,255,.15) !important; margin: 0 !important; }"],
     ),
     pn.pane.HTML(
         '<div style="padding:12px;margin:0 14px 14px;border-radius:8px;'
@@ -716,6 +718,7 @@ sidebar = pn.Column(
         'Abhilash Janardhanan · x23121424'
         '</div>',
         sizing_mode="stretch_width",
+        margin=0,
     ),
     styles={"width": "100%", "padding": "0"},
 )
