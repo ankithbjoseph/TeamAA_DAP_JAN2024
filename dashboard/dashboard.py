@@ -250,7 +250,7 @@ def create_scatter_plot(column: str, location: str, daterange):
             x_axis_label=label,
             y_axis_label="Pedestrian Count",
             tools="crosshair,pan,wheel_zoom,zoom_in,zoom_out,reset,save",
-            height=420,
+            height=560,
         )
         _style_figure(p)
         source = ColumnDataSource({
@@ -306,7 +306,7 @@ def create_line_plot(var: str, loc: str, daterange, avgby: str):
             x_axis_type="datetime",
             title=f"{var}  &  footfall at {loc}  ·  {avgby} average",
             tools="crosshair,pan,wheel_zoom,zoom_in,zoom_out,reset,save",
-            height=420,
+            height=560,
         )
         _style_figure(p)
         p.xaxis.axis_label = "Date"
@@ -384,6 +384,7 @@ body, .bk-root {
 .mdc-drawer, .mdc-drawer__content {
   background: linear-gradient(175deg, #1E3A8A 0%, #1E40AF 100%) !important;
   border-right: none !important;
+  padding: 0 !important;
 }
 
 /* Sidebar nav (RadioButtonGroup) lives in shadow DOM — styled via the
@@ -509,7 +510,7 @@ NAV_CSS = """
 :host { width: 100%; }
 .bk-btn-group {
   display: flex !important; flex-direction: column !important;
-  gap: 2px !important; padding: 4px 8px !important; background: transparent !important;
+  gap: 2px !important; padding: 4px 14px !important; background: transparent !important;
 }
 .bk-btn-group .bk-btn {
   display: flex !important; align-items: center !important; text-align: left !important;
@@ -517,7 +518,7 @@ NAV_CSS = """
   color: rgba(255,255,255,.72) !important;
   font-family: 'Fira Sans', system-ui, sans-serif !important;
   font-size: 14px !important; font-weight: 500 !important;
-  padding: 10px 14px !important; cursor: pointer !important; width: 100% !important;
+  padding: 10px 10px !important; cursor: pointer !important; width: 100% !important;
   outline: none !important;
   transition: background 150ms ease-out, color 150ms ease-out !important;
 }
@@ -689,7 +690,7 @@ nav = pn.widgets.RadioButtonGroup(
 
 sidebar = pn.Column(
     pn.pane.HTML(
-        '<div style="padding:22px 18px 14px;">'
+        '<div style="padding:22px 14px 14px;">'
         '<div style="font-family:\'Fira Code\',monospace;font-size:15px;font-weight:600;'
         'color:#fff;letter-spacing:-0.01em;line-height:1.2;">Dublin Footfall</div>'
         '<div style="font-family:\'Fira Sans\',sans-serif;font-size:11px;font-weight:500;'
@@ -700,11 +701,11 @@ sidebar = pn.Column(
     ),
     nav,
     pn.layout.Divider(
-        margin=(12, 8, 4, 8),
+        margin=(12, 14, 4, 14),
         stylesheets=["hr { border-color: rgba(255,255,255,.15) !important; }"],
     ),
     pn.pane.HTML(
-        '<div style="padding:12px;margin:0 8px 8px;border-radius:8px;'
+        '<div style="padding:12px;margin:0 14px 14px;border-radius:8px;'
         'background:rgba(255,255,255,.08);font-family:\'Fira Sans\',sans-serif;'
         'font-size:11px;color:rgba(255,255,255,.55);line-height:1.9;">'
         '<div style="font-size:10px;font-weight:700;letter-spacing:.1em;'
