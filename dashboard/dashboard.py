@@ -518,6 +518,7 @@ NAV_CSS = """
   font-family: 'Fira Sans', system-ui, sans-serif !important;
   font-size: 14px !important; font-weight: 500 !important;
   padding: 10px 14px !important; cursor: pointer !important; width: 100% !important;
+  outline: none !important;
   transition: background 150ms ease-out, color 150ms ease-out !important;
 }
 .bk-btn-group .bk-btn:hover { background: rgba(255,255,255,.10) !important; color: #fff !important; }
@@ -599,8 +600,6 @@ DATE_SLIDER_CSS = """
   border: none !important;
   border-radius: 4px !important;
   box-shadow: none !important;
-  height: 4px !important;
-  margin: 4px 8px !important;
 }
 .noUi-connect { background: #1E40AF !important; }
 .noUi-handle {
@@ -609,10 +608,6 @@ DATE_SLIDER_CSS = """
   border-radius: 50% !important;
   box-shadow: 0 1px 4px rgba(30,64,175,.25) !important;
   cursor: pointer !important;
-  right: -8px !important;
-  top: -7px !important;
-  width: 16px !important;
-  height: 16px !important;
 }
 .noUi-handle::before, .noUi-handle::after { display: none !important; }
 .noUi-tooltip {
@@ -655,6 +650,7 @@ TOGGLE_CSS = """
   align-items: center !important;
   justify-content: center !important;
   cursor: pointer !important;
+  outline: none !important;
   transition: background 150ms ease-out, color 150ms ease-out, border-color 150ms ease-out !important;
   white-space: nowrap !important;
 }
