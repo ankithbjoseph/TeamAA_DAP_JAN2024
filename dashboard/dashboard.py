@@ -384,13 +384,11 @@ body, .bk-root {
 .mdc-drawer, .mdc-drawer__content {
   background: linear-gradient(175deg, #1E3A8A 0%, #1E40AF 100%) !important;
   border-right: none !important;
+}
+.mdc-drawer__content {
   padding-left: 0 !important;
   padding-right: 0 !important;
   padding-bottom: 0 !important;
-}
-/* Push content below the fixed top app bar (64 px default height) */
-.mdc-drawer__content {
-  padding-top: var(--mdc-top-app-bar-height, 64px) !important;
 }
 
 /* Sidebar nav (RadioButtonGroup) lives in shadow DOM — styled via the
