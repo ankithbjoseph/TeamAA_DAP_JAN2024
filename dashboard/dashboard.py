@@ -384,7 +384,13 @@ body, .bk-root {
 .mdc-drawer, .mdc-drawer__content {
   background: linear-gradient(175deg, #1E3A8A 0%, #1E40AF 100%) !important;
   border-right: none !important;
-  padding: 0 !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  padding-bottom: 0 !important;
+}
+/* Push content below the fixed top app bar (64 px default height) */
+.mdc-drawer__content {
+  padding-top: var(--mdc-top-app-bar-height, 64px) !important;
 }
 
 /* Sidebar nav (RadioButtonGroup) lives in shadow DOM — styled via the
@@ -832,11 +838,13 @@ def createpage_1():
     parameter_column  = pn.widgets.Select(
         name="Parameter", options=list(parameters_dict.keys()),
         sizing_mode="stretch_width",
+        margin=0,
         stylesheets=[SELECT_CSS],
     )
     location_column = pn.widgets.Select(
         name="Location", options=list(locations),
         sizing_mode="stretch_width",
+        margin=0,
         stylesheets=[SELECT_CSS],
     )
     date_range_slider = pn.widgets.DateRangeSlider(
@@ -845,6 +853,7 @@ def createpage_1():
         end=dt.datetime(2023, 12, 31, 23, 59),
         value=(dt.datetime(2023, 1, 1), dt.datetime(2023, 12, 31, 23, 59)),
         sizing_mode="stretch_width",
+        margin=0,
         stylesheets=[DATE_SLIDER_CSS],
     )
 
@@ -897,11 +906,13 @@ def createpage_3():
     parameter_column  = pn.widgets.Select(
         name="Parameter", options=list(parameters_dict.keys()),
         sizing_mode="stretch_width",
+        margin=0,
         stylesheets=[SELECT_CSS],
     )
     location_column = pn.widgets.Select(
         name="Location", options=list(locations),
         sizing_mode="stretch_width",
+        margin=0,
         stylesheets=[SELECT_CSS],
     )
     date_range_slider = pn.widgets.DateRangeSlider(
@@ -910,6 +921,7 @@ def createpage_3():
         end=dt.datetime(2023, 12, 31, 23, 59),
         value=(dt.datetime(2023, 1, 1), dt.datetime(2023, 12, 31, 23, 59)),
         sizing_mode="stretch_width",
+        margin=0,
         stylesheets=[DATE_SLIDER_CSS],
     )
     toggle_group = pn.widgets.ToggleGroup(
@@ -918,6 +930,7 @@ def createpage_3():
         behavior="radio",
         button_type="light",
         sizing_mode="stretch_width",
+        margin=0,
         stylesheets=[TOGGLE_CSS],
     )
 
@@ -942,7 +955,8 @@ def createpage_3():
                     stylesheets=["hr { border-color: #DBEAFE !important; }"],
                 ),
                 pn.pane.HTML(
-                    f'<p style="{_SUB_H_CSS}margin-top:0;">Aggregate by</p>'
+                    f'<p style="{_SUB_H_CSS}margin-top:0;">Aggregate by</p>',
+                    margin=0,
                 ),
                 toggle_group,
                 pn.layout.Divider(
