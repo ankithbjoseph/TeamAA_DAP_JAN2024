@@ -386,100 +386,14 @@ body, .bk-root {
   border-right: none !important;
 }
 
-/* ── Sidebar nav (RadioButtonGroup vertical) ─────────────────── */
-.mdc-drawer .bk-btn-group {
-  display: flex !important;
-  flex-direction: column !important;
-  gap: 2px !important;
-  padding: 4px 8px !important;
-}
-.mdc-drawer .bk-btn-group .bk-btn {
-  text-align: left !important;
-  border: none !important;
-  border-left: 3px solid transparent !important;
-  border-radius: 6px !important;
-  background: transparent !important;
-  color: rgba(255,255,255,.78) !important;
-  font-family: 'Fira Sans', sans-serif !important;
-  font-size: 14px !important;
-  font-weight: 500 !important;
-  padding: 10px 14px !important;
-  cursor: pointer !important;
-  transition: background var(--t), color var(--t) !important;
-  width: 100% !important;
-}
-.mdc-drawer .bk-btn-group .bk-btn:hover {
-  background: rgba(255,255,255,.12) !important;
-  color: #fff !important;
-}
-.mdc-drawer .bk-btn-group .bk-btn.bk-active {
-  background: rgba(255,255,255,.18) !important;
-  color: #fff !important;
-  font-weight: 600 !important;
-  border-left-color: #D97706 !important;
-}
+/* Sidebar nav (RadioButtonGroup) lives in shadow DOM — styled via the
+   NAV_CSS widget stylesheet below, not from this document-level sheet. */
 
 /* ── Main content area ───────────────────────────────────────── */
 .mdc-drawer-app-content { background: var(--c-bg) !important; }
 
-/* ── Widgets (Select, DateRange) ─────────────────────────────── */
-.bk-input, select.bk-input {
-  border: 1px solid var(--c-border) !important;
-  border-radius: 6px !important;
-  font-family: 'Fira Sans', sans-serif !important;
-  font-size: 13px !important;
-  color: var(--c-text) !important;
-  background: #fff !important;
-  padding: 6px 10px !important;
-  transition: border-color var(--t), box-shadow var(--t) !important;
-  width: 100% !important;
-}
-.bk-input:focus, select.bk-input:focus {
-  border-color: #3B82F6 !important;
-  box-shadow: 0 0 0 3px rgba(59,130,246,.20) !important;
-  outline: none !important;
-}
-.bk-slider-title, .bk-input-group label {
-  font-family: 'Fira Sans', sans-serif !important;
-  font-size: 12px !important;
-  font-weight: 600 !important;
-  color: var(--c-text) !important;
-  letter-spacing: .03em !important;
-}
-
-/* ── ToggleGroup (avg-by buttons) ────────────────────────────── */
-.dap-controls .bk-btn-group {
-  display: flex !important;
-  flex-direction: row !important;
-  gap: 4px !important;
-  flex-wrap: nowrap !important;
-  align-items: stretch !important;
-  width: 100% !important;
-}
-.dap-controls .bk-btn-group .bk-btn {
-  border: 1px solid var(--c-border) !important;
-  border-radius: 6px !important;
-  background: #fff !important;
-  color: var(--c-muted-t) !important;
-  font-family: 'Fira Sans', sans-serif !important;
-  font-size: 12px !important;
-  font-weight: 500 !important;
-  padding: 0 8px !important;
-  min-height: 36px !important;
-  flex: 1 1 0 !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  cursor: pointer !important;
-  transition: background var(--t), color var(--t), border-color var(--t) !important;
-  white-space: nowrap !important;
-}
-.dap-controls .bk-btn-group .bk-btn:hover,
-.dap-controls .bk-btn-group .bk-btn.bk-active {
-  background: var(--c-primary) !important;
-  border-color: var(--c-primary) !important;
-  color: #fff !important;
-}
+/* Widget controls (Select, DateRangeSlider, ToggleGroup) live in Bokeh 3.x
+   shadow DOM — styled via SELECT_CSS / DATE_SLIDER_CSS / TOGGLE_CSS below. */
 
 /* ── Data table ──────────────────────────────────────────────── */
 .dap-table-wrap {
@@ -532,25 +446,6 @@ body, .bk-root {
     padding: 16px !important;
   }
 
-  /* Prevent iOS input zoom (needs 16px) */
-  .bk-input, select.bk-input {
-    font-size: 16px !important;
-    min-height: 44px !important;
-  }
-
-  /* Larger touch targets for toggle buttons */
-  .dap-controls .bk-btn-group .bk-btn {
-    min-height: 44px !important;
-    font-size: 13px !important;
-  }
-
-  /* Larger nav buttons */
-  .mdc-drawer .bk-btn-group .bk-btn {
-    font-size: 13px !important;
-    min-height: 44px !important;
-    padding: 12px 14px !important;
-  }
-
   /* Shrink top bar title */
   .mdc-top-app-bar__title {
     font-size: 12px !important;
@@ -570,27 +465,241 @@ body, .bk-root {
     padding: 12px !important;
   }
 }
+
 """
 
 pn.extension(raw_css=[CUSTOM_CSS])
 
 
 # ── Sidebar ───────────────────────────────────────────────────────────────────
+# Bokeh 3.x renders widgets inside shadow DOM, so the document-level raw_css
+# cannot reach the nav buttons. Panel injects `stylesheets` into the widget's
+# own shadow root, so the nav is styled here. Selectors are shadow-scoped
+# (no .mdc-drawer ancestor); colours assume the dark sidebar context.
+_NAV_ICON = {
+    1: ("%3Cpath d='M3 9.5 12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z'/%3E"
+        "%3Cpath d='M9 21v-7h6v7'/%3E"),
+    2: ("%3Crect x='3' y='4' width='18' height='16' rx='1.5'/%3E"
+        "%3Cpath d='M3 10h18'/%3E%3Cpath d='M3 15h18'/%3E%3Cpath d='M10 4v16'/%3E"),
+    3: ("%3Cpath d='M5 4v15h15'/%3E"
+        "%3Ccircle cx='10' cy='14' r='1.4' fill='%23000' stroke='none'/%3E"
+        "%3Ccircle cx='14' cy='10' r='1.4' fill='%23000' stroke='none'/%3E"
+        "%3Ccircle cx='18' cy='12' r='1.4' fill='%23000' stroke='none'/%3E"
+        "%3Ccircle cx='12' cy='16' r='1.4' fill='%23000' stroke='none'/%3E"),
+    4: ("%3Cpath d='M5 4v15h15'/%3E%3Cpath d='M8 14l3-4 3 2 4-5'/%3E"),
+    5: ("%3Cpath d='M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z'/%3E"
+        "%3Cpath d='M14 3v6h6'/%3E%3Cpath d='M9 13h6'/%3E%3Cpath d='M9 17h4'/%3E"),
+}
+
+def _icon_url(paths: str) -> str:
+    head = ("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' "
+            "viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' "
+            "stroke-linecap='round' stroke-linejoin='round'%3E")
+    return head + paths + "%3C/svg%3E"
+
+_NAV_ICON_RULES = "\n".join(
+    f".bk-btn-group .bk-btn:nth-of-type({i})::before {{"
+    f"background-color:currentColor;"
+    f"-webkit-mask-image:url(\"{_icon_url(p)}\");"
+    f"mask-image:url(\"{_icon_url(p)}\");}}"
+    for i, p in _NAV_ICON.items()
+)
+
+NAV_CSS = """
+:host { width: 100%; }
+.bk-btn-group {
+  display: flex !important; flex-direction: column !important;
+  gap: 2px !important; padding: 4px 8px !important; background: transparent !important;
+}
+.bk-btn-group .bk-btn {
+  display: flex !important; align-items: center !important; text-align: left !important;
+  border: none !important; border-radius: 8px !important; background: transparent !important;
+  color: rgba(255,255,255,.72) !important;
+  font-family: 'Fira Sans', system-ui, sans-serif !important;
+  font-size: 14px !important; font-weight: 500 !important;
+  padding: 10px 14px !important; cursor: pointer !important; width: 100% !important;
+  transition: background 150ms ease-out, color 150ms ease-out !important;
+}
+.bk-btn-group .bk-btn:hover { background: rgba(255,255,255,.10) !important; color: #fff !important; }
+.bk-btn-group .bk-btn:focus-visible { outline: 2px solid #BFDBFE !important; outline-offset: 2px !important; }
+.bk-btn-group .bk-btn.bk-active {
+  background: rgba(255,255,255,.20) !important; color: #fff !important; font-weight: 600 !important;
+}
+.bk-btn-group .bk-btn::before {
+  content: "" !important; flex: 0 0 17px !important;
+  width: 17px !important; height: 17px !important; margin-right: 11px !important;
+  background-color: transparent;
+  -webkit-mask-position: center; mask-position: center;
+  -webkit-mask-size: contain; mask-size: contain;
+  -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+  transition: background-color 150ms ease-out;
+}
+""" + _NAV_ICON_RULES + """
+.bk-btn-group .bk-btn.bk-active::before { background-color: #F59E0B !important; }
+@media (max-width: 768px) {
+  .bk-btn-group .bk-btn { min-height: 44px !important; padding: 12px 14px !important; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .bk-btn-group .bk-btn, .bk-btn-group .bk-btn::before { transition: none !important; }
+}
+"""
+
+# Shadow-root stylesheet for Select widgets (Bokeh 3.x shadow DOM)
+SELECT_CSS = """
+:host { width: 100%; display: block; }
+.bk-input-group { width: 100%; }
+.bk-input-group label {
+  font-family: 'Fira Sans', sans-serif !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  color: #1E3A8A !important;
+  letter-spacing: .03em !important;
+  display: block !important;
+  margin-bottom: 4px !important;
+}
+.bk-input, select.bk-input {
+  border: 1px solid #DBEAFE !important;
+  border-radius: 6px !important;
+  font-family: 'Fira Sans', sans-serif !important;
+  font-size: 13px !important;
+  color: #1E3A8A !important;
+  background: #fff !important;
+  padding: 6px 10px !important;
+  transition: border-color 150ms ease-out, box-shadow 150ms ease-out !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+.bk-input:focus, select.bk-input:focus {
+  border-color: #3B82F6 !important;
+  box-shadow: 0 0 0 3px rgba(59,130,246,.20) !important;
+  outline: none !important;
+}
+@media (max-width: 768px) {
+  .bk-input, select.bk-input { font-size: 16px !important; min-height: 44px !important; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .bk-input, select.bk-input { transition: none !important; }
+}
+"""
+
+# Shadow-root stylesheet for DateRangeSlider (noUiSlider inside Bokeh shadow DOM)
+DATE_SLIDER_CSS = """
+:host { width: 100%; display: block; }
+.bk-slider-title {
+  font-family: 'Fira Sans', sans-serif !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  color: #1E3A8A !important;
+  letter-spacing: .03em !important;
+  display: block !important;
+  margin-bottom: 10px !important;
+}
+.noUi-target {
+  background: #E9EEF6 !important;
+  border: none !important;
+  border-radius: 4px !important;
+  box-shadow: none !important;
+  height: 4px !important;
+  margin: 4px 8px !important;
+}
+.noUi-connect { background: #1E40AF !important; }
+.noUi-handle {
+  background: #fff !important;
+  border: 2px solid #1E40AF !important;
+  border-radius: 50% !important;
+  box-shadow: 0 1px 4px rgba(30,64,175,.25) !important;
+  cursor: pointer !important;
+  right: -8px !important;
+  top: -7px !important;
+  width: 16px !important;
+  height: 16px !important;
+}
+.noUi-handle::before, .noUi-handle::after { display: none !important; }
+.noUi-tooltip {
+  font-family: 'Fira Code', monospace !important;
+  font-size: 10px !important;
+  color: #1E3A8A !important;
+  background: #fff !important;
+  border: 1px solid #DBEAFE !important;
+  border-radius: 4px !important;
+  padding: 2px 6px !important;
+  white-space: nowrap !important;
+}
+"""
+
+# Shadow-root stylesheet for ToggleGroup avg-by buttons
+TOGGLE_CSS = """
+:host { width: 100%; display: block; }
+.bk-btn-group {
+  display: flex !important;
+  flex-direction: row !important;
+  gap: 4px !important;
+  flex-wrap: nowrap !important;
+  align-items: stretch !important;
+  width: 100% !important;
+  background: transparent !important;
+  padding: 0 !important;
+}
+.bk-btn-group .bk-btn {
+  border: 1px solid #DBEAFE !important;
+  border-radius: 6px !important;
+  background: #fff !important;
+  color: #64748B !important;
+  font-family: 'Fira Sans', sans-serif !important;
+  font-size: 12px !important;
+  font-weight: 500 !important;
+  padding: 0 8px !important;
+  min-height: 36px !important;
+  flex: 1 1 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  cursor: pointer !important;
+  transition: background 150ms ease-out, color 150ms ease-out, border-color 150ms ease-out !important;
+  white-space: nowrap !important;
+}
+.bk-btn-group .bk-btn:hover {
+  background: #1E40AF !important;
+  border-color: #1E40AF !important;
+  color: #fff !important;
+}
+.bk-btn-group .bk-btn.bk-active {
+  background: #1E40AF !important;
+  border-color: #1E40AF !important;
+  color: #fff !important;
+}
+.bk-btn-group .bk-btn:focus-visible {
+  outline: 2px solid #3B82F6 !important;
+  outline-offset: 2px !important;
+}
+@media (max-width: 768px) {
+  .bk-btn-group .bk-btn { min-height: 44px !important; font-size: 13px !important; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .bk-btn-group .bk-btn { transition: none !important; }
+}
+"""
+
 nav = pn.widgets.RadioButtonGroup(
     name="",
-    options=["Introduction", "Dataset", "Relationship b/w variables",
-             "Distribution of variables", "Project Report"],
+    options=["Introduction", "Dataset", "Relationships",
+             "Time Series", "Project Report"],
     value="Introduction",
     orientation="vertical",
     button_type="default",
     sizing_mode="stretch_width",
+    stylesheets=[NAV_CSS],
 )
 
 sidebar = pn.Column(
     pn.pane.HTML(
-        '<div style="padding:20px 16px 6px;font-family:\'Fira Code\',monospace;'
-        'font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;'
-        'color:rgba(255,255,255,.40);">Navigation</div>',
+        '<div style="padding:22px 18px 14px;">'
+        '<div style="font-family:\'Fira Code\',monospace;font-size:15px;font-weight:600;'
+        'color:#fff;letter-spacing:-0.01em;line-height:1.2;">Dublin Footfall</div>'
+        '<div style="font-family:\'Fira Sans\',sans-serif;font-size:11px;font-weight:500;'
+        'color:rgba(255,255,255,.55);margin-top:3px;letter-spacing:.02em;">'
+        'Weather · Air Quality · 2023</div>'
+        '</div>',
         sizing_mode="stretch_width",
     ),
     nav,
@@ -723,10 +832,12 @@ def createpage_1():
     parameter_column  = pn.widgets.Select(
         name="Parameter", options=list(parameters_dict.keys()),
         sizing_mode="stretch_width",
+        stylesheets=[SELECT_CSS],
     )
     location_column = pn.widgets.Select(
         name="Location", options=list(locations),
         sizing_mode="stretch_width",
+        stylesheets=[SELECT_CSS],
     )
     date_range_slider = pn.widgets.DateRangeSlider(
         name="Date Range",
@@ -734,6 +845,7 @@ def createpage_1():
         end=dt.datetime(2023, 12, 31, 23, 59),
         value=(dt.datetime(2023, 1, 1), dt.datetime(2023, 12, 31, 23, 59)),
         sizing_mode="stretch_width",
+        stylesheets=[DATE_SLIDER_CSS],
     )
 
     @pn.depends(parameter_column.param.value, location_column.param.value,
@@ -743,7 +855,7 @@ def createpage_1():
 
     return pn.Column(
         _page_header(
-            "Relationship Between Variables",
+            "Relationships",
             "Explore correlations between environmental / AQI parameters and pedestrian footfall.",
         ),
         pn.FlexBox(
@@ -785,10 +897,12 @@ def createpage_3():
     parameter_column  = pn.widgets.Select(
         name="Parameter", options=list(parameters_dict.keys()),
         sizing_mode="stretch_width",
+        stylesheets=[SELECT_CSS],
     )
     location_column = pn.widgets.Select(
         name="Location", options=list(locations),
         sizing_mode="stretch_width",
+        stylesheets=[SELECT_CSS],
     )
     date_range_slider = pn.widgets.DateRangeSlider(
         name="Date Range",
@@ -796,6 +910,7 @@ def createpage_3():
         end=dt.datetime(2023, 12, 31, 23, 59),
         value=(dt.datetime(2023, 1, 1), dt.datetime(2023, 12, 31, 23, 59)),
         sizing_mode="stretch_width",
+        stylesheets=[DATE_SLIDER_CSS],
     )
     toggle_group = pn.widgets.ToggleGroup(
         name="Average by",
@@ -803,6 +918,7 @@ def createpage_3():
         behavior="radio",
         button_type="light",
         sizing_mode="stretch_width",
+        stylesheets=[TOGGLE_CSS],
     )
 
     @pn.depends(parameter_column.param.value, location_column.param.value,
@@ -812,7 +928,7 @@ def createpage_3():
 
     return pn.Column(
         _page_header(
-            "Variable Distribution Over Time",
+            "Time Series",
             "Compare daily / weekly / monthly averages of a weather or AQI variable "
             "against pedestrian counts at a chosen location.",
         ),
@@ -860,11 +976,11 @@ def createpage_4():
 
 # ── App assembly ───────────────────────────────────────────────────────────────
 _page_creators = {
-    "Introduction":              createpage_0,
-    "Dataset":                   createpage_2,
-    "Relationship b/w variables": createpage_1,
-    "Distribution of variables": createpage_3,
-    "Project Report":            createpage_4,
+    "Introduction":   createpage_0,
+    "Dataset":        createpage_2,
+    "Relationships":  createpage_1,
+    "Time Series":    createpage_3,
+    "Project Report": createpage_4,
 }
 
 mapping    = {k: v() for k, v in _page_creators.items()}
@@ -879,7 +995,7 @@ def _nav_changed(event):
 nav.param.watch(_nav_changed, "value")
 
 dashboard = pn.template.MaterialTemplate(
-    title="Dashboard — Environmental Impact on Pedestrian Footfall in Dublin",
+    title="Environmental Impact on Pedestrian Footfall in Dublin · 2023",
     sidebar=[sidebar],
     main=[main_area],
     sidebar_width=280,

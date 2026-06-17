@@ -168,3 +168,5 @@ output
 analysis/analysistest.ipynb
 analysis/analysistest.py
 dashboard/dashboard.md
+.ruff_cache/
+PRODUCT.md
